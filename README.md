@@ -17,7 +17,6 @@ https://github.com/ZhaoYi1031/WordCountAutoTest
 3. 编译并执行同学们的代码，执行的输入文件就是第2步中的txt文件，生成的测试结果和第二步中的答案进行对比
 4. 将每个同学执行的用例通过数记录下来，存入csv文件中。
 
-
 具体API
 
 ## DataGenerator 数据生成器 已完成
@@ -26,33 +25,9 @@ https://github.com/ZhaoYi1031/WordCountAutoTest
 
 ## GitUtil 已完成
 
-## CSVUtil
+## CSVUtil 已完成
 
-```java
-/**
- * 生成CSV
- *
- * @author <a href="mailto:410486047@qq.com">Grey</a>
- * @date 2021/3/2
- * @since
- */
-public class CSVUtil {
-    /**
-     * 将content写入csv中
-     * PS： content的格式请写这个API的人定好
-     * csvLocation是csv的路径，如果不存在，需要新建
-     *
-     * @param content     内容
-     * @param csvLocation csv的路径
-     * @return 如果成功则返回true，不成功则返回false
-     */
-    public static boolean exportToCSV(String content, String csvLocation) {
-        // TODO
-        // 参考auto.test.wordcount.Main.java文件中第100，101行
-        return false;
-    }
-}
-```
+用法见：CSVUtilTest
 
 ## Executor接口，用于执行程序并测试
 
@@ -64,49 +39,25 @@ public interface Executor {
      * @param src    源码目录
      * @param input  测试用例
      */
-    Result exec(String src, String input);
+    void exec(String src, String input);
 }
 ```
 
-不同语言实现这个接口即可，例如:
+不同语言实现这个接口即可
 
-### Java测试程序
+## Judge接口， 用于判断测试用例的通过与否
 
 ```java
-public class JavaExecutor implements Executor {
-    @Override
-    public Result exec(String src, String input) {
-        // TODO
-        return null;
-    }
+public interface Judge {
+    /**
+     * 评判方法
+     *
+     * @param result 结果文件，可以是内容，也可以是路径，看各个题目要求定
+     * @param answer 答案文件
+     * @return
+     */
+    Result judge(String result, String answer);
 }
 ```
-
-### C++测试程序
-
-```java
-public class CppExecutor implements Executor {
-    @Override
-    public Result exec(String src, String input) {
-        // TODO
-        return null;
-    }
-}
-```
-
-### Python测试程序
-
-```java
-public class PythonExecutor implements Executor {
-    @Override
-    public Result exec(String src, String input) {
-        // TODO
-        return null;
-    }
-}
-```
-
-### NodeJS测试程序
-
 
 
