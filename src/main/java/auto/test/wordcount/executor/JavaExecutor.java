@@ -15,6 +15,16 @@ import static auto.test.wordcount.utils.FileUtil.getFolder;
  */
 public class JavaExecutor implements Executor {
     /**
+     *
+     * @param mainFile
+     */
+    @Override
+    public void compile(String mainFile) {
+        String defaultClassPath = getFolder(mainFile);
+        javac(defaultClassPath, mainFile);
+    }
+
+    /**
      * @param mainFile Main方法的全路径
      * @param input    测试用例参数 eg: -n input.txt
      * @return
@@ -23,7 +33,6 @@ public class JavaExecutor implements Executor {
     public void exec(String mainFile, String input) {
         String defaultClassPath = getFolder(mainFile);
         String mainClass = getCompileClassName(mainFile);
-        javac(defaultClassPath, mainFile);
         java(defaultClassPath, mainClass, input);
     }
 
@@ -59,7 +68,7 @@ public class JavaExecutor implements Executor {
 
     /**
      * 编译Java程序
-     * javac -encoding UTF-8 -cp C:\git\wordcount\src C:\git\wordcount\src\Main.java
+     * javac -encoding UTF-8 -cp C:\git\wordcount\src C:\git\wordcount\src\WordCount.java
      *
      * @param classPath     指定classpath，如果不指定，则默认为Main文件所在目录 以上例子 classPath为：C:\git\wordcount\src
      * @param mainClassPath Main文件的全路径 以上例子 mainClass为：C:\git\wordcount\src\Main.java

@@ -8,6 +8,11 @@ package auto.test.wordcount.executor;
  */
 public class CppExecutor implements Executor {
     @Override
+    public void compile(String src) {
+
+    }
+
+    @Override
     public void exec(String src, String input) {
         // TODO
 

@@ -7,6 +7,12 @@ package auto.test.wordcount.executor;
  */
 public interface Executor {
     /**
+     * 编译程序
+     *
+     * @param src    源码目录
+     */
+    void compile(String src);
+    /**
      * 执行程序
      *
      * @param src    源码目录
