@@ -1,6 +1,13 @@
 package auto.test.wordcount.utils;
 
-import auto.test.wordcount.Result;
+import auto.test.wordcount.ReportData;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.List;
 
 /**
  * 生成CSV
@@ -11,18 +18,45 @@ import auto.test.wordcount.Result;
  */
 public class CSVUtil {
     /**
-     * 将content写入csv中
-     * PS： content的格式请写这个API的人定好并写明注释
+     * 将reportData写入csv中
      * csvLocation是csv的路径，如果不存在，需要新建
      *
-     * @param content     内容
+     * @param reportData  需要导出的csv数据的表头和内容
      * @param csvLocation csv的路径
      * @return 如果成功则返回true，不成功则返回false
      */
-    public static boolean exportToCSV(Result content, String csvLocation) {
-        // TODO
-        // 参考auto.test.wordcount.Main.java文件中第100，101行
-        // test push
-        return false;
+    public static boolean exportToCSV(ReportData reportData, String csvLocation) {
+        final File csvFile = new File(csvLocation);
+
+        if (!csvFile.getParentFile().exists()) {
+            if (!csvFile.getParentFile().mkdirs()) {
+                return false;
+            }
+        }
+        if (!csvFile.exists()) {
+            try {
+                if (!csvFile.createNewFile()) {
+                    return false;
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+
+        final String[] headers = reportData.headers();
+        final List<List<String>> records = reportData.records();
+
+        try (FileWriter out = new FileWriter(csvFile);
+             CSVPrinter printer = new CSVPrinter(out, CSVFormat.DEFAULT.withHeader(headers))) {
+            for (List<String> record : records) {
+                printer.printRecords(record);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        return true;
     }
 }
