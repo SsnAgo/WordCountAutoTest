@@ -50,7 +50,7 @@ public class CSVUtil {
         try (FileWriter out = new FileWriter(csvFile);
              CSVPrinter printer = new CSVPrinter(out, CSVFormat.DEFAULT.withHeader(headers))) {
             for (List<String> record : records) {
-                printer.printRecords(record);
+                printer.printRecord(record);
             }
         } catch (IOException e) {
             e.printStackTrace();
