@@ -1,8 +1,9 @@
 package auto.test.wordcount;
 
 /**
+ * TODO 这个类的设计需要再考虑，暂不抽象，目前先实现功能
  * @author <a href="mailto:410486047@qq.com">Grey</a>
- * @date 2021/3/2
+ * @date 2021/3/4
  * @since
  */
 public class Result {
@@ -13,59 +14,49 @@ public class Result {
     /**
      * 输出结果
      */
-    private String output;
+    private String result;
     /**
      * 测试用例
      */
-    private String input;
+    private String answer;
     /**
-     * 花费时间
+     * 是否通过
      */
-    private Long cost;
-    /**
-     * 得分
-     */
-    private Double score;
+    private boolean pass;
 
     public String getSrc() {
         return src;
     }
 
-    public void setSrc(String src) {
+    public Result src(String src) {
         this.src = src;
+        return this;
     }
 
-    public String getOutput() {
-        return output;
+    public String getResult() {
+        return result;
     }
 
-    public void setOutput(String output) {
-        this.output = output;
+    public Result result(String result) {
+        this.result = result;
+        return this;
     }
 
-    public String getInput() {
-        return input;
+    public String getAnswer() {
+        return answer;
     }
 
-    public void setInput(String input) {
-        this.input = input;
+    public Result answer(String answer) {
+        this.answer = answer;
+        return this;
     }
 
-    public Long getCost() {
-        return cost;
+    public boolean isPass() {
+        return pass;
     }
 
-    public void setCost(Long cost) {
-        this.cost = cost;
+    public Result pass(boolean pass) {
+        this.pass = pass;
+        return this;
     }
-
-    public Double getScore() {
-        return score;
-    }
-
-    public void setScore(Double score) {
-        this.score = score;
-    }
-
-
 }

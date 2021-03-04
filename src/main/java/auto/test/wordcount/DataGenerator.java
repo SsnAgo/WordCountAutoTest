@@ -24,6 +24,7 @@ public class DataGenerator {
 
 
     // Math.random() [0,1) ->
+    // TODO 概率是否需要调整；单词重复率低。 @kofyou
     private static char generateASCII() {
         if (Math.random() > 0.3) {
             // 70%的概率生成大小写字母
@@ -38,15 +39,15 @@ public class DataGenerator {
             }
         }
         // 30%的概率是其他字符
-		int noneAlpha = (int) (Math.random() * 127);
-		double ctrlChance = (double) noneAlpha / (double) 31;
-		if (ctrlChance < 0.2) {
-			noneAlpha = (int) ('\r');
-		} else if (ctrlChance < 0.4) {
-			noneAlpha = (int) ('\n');
-		} else if (ctrlChance < 1) {
-			noneAlpha = (int) ('\t');
-		}
+        int noneAlpha = (int) (Math.random() * 127);
+        double ctrlChance = (double) noneAlpha / (double) 31;
+        if (ctrlChance < 0.2) {
+            noneAlpha = (int) ('\r');
+        } else if (ctrlChance < 0.4) {
+            noneAlpha = (int) ('\n');
+        } else if (ctrlChance < 1) {
+            noneAlpha = (int) ('\t');
+        }
         return (char) (noneAlpha);
     }
 

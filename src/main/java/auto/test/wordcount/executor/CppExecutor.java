@@ -1,7 +1,5 @@
 package auto.test.wordcount.executor;
 
-import auto.test.wordcount.Result;
-
 /**
  * C++执行程序
  * @author <a href="mailto:410486047@qq.com">Grey</a>

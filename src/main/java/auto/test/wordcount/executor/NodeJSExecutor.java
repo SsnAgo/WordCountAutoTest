@@ -1,7 +1,5 @@
 package auto.test.wordcount.executor;
 
-import auto.test.wordcount.Result;
-
 /**
  * NodeJS执行程序
  *
