@@ -50,11 +50,7 @@ public class JavaExecutor implements Executor {
      */
     public void java(String classPath, String mainClass, String input) {
         try {
-            if (null != input && !input.trim().equals("")) {
-                cmd("java -classpath " + classPath + " " + mainClass);
-            } else {
-                cmd("java -classpath " + classPath + " " + mainClass + " " + input);
-            }
+            cmd("java -classpath " + classPath + " " + mainClass + " " + input.trim());
         } catch (IOException e) {
             e.printStackTrace();
         }
