@@ -9,6 +9,14 @@ public class JudgeItem {
     private String score;
     private String time;
 
+    public JudgeItem() {
+    }
+
+    public JudgeItem(String score, String time) {
+        this.score = score;
+        this.time = time;
+    }
+
     public String getScore() {
         return score;
     }

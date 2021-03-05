@@ -1,10 +1,15 @@
 package auto.test.wordcount.utils;
 
+import auto.test.wordcount.judge.Judge;
+import auto.test.wordcount.judge.JudgeItem;
+import auto.test.wordcount.judge.JudgeResult;
 import auto.test.wordcount.report.ReportData;
+import auto.test.wordcount.report.WordCountReportData;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class CSVUtilTest {
@@ -39,5 +44,16 @@ public class CSVUtilTest {
             }
         };
         CSVUtil.exportToCSV(reportData, "D:\\git2\\result.csv");
+    }
+
+    @Test
+    public void testWordCountReport(){
+        List<JudgeResult> results = new ArrayList<>();
+        final JudgeResult result1 = new JudgeResult("2111111", Arrays.asList(new JudgeItem("100", "22"), new JudgeItem("200", "11")));
+        final JudgeResult result2 = new JudgeResult("22222222", Arrays.asList(new JudgeItem("11", "11"), new JudgeItem("11", "11")));
+        results.add(result1);
+        results.add(result2);
+        final WordCountReportData wordCountReportData = new WordCountReportData(results);
+        CSVUtil.exportToCSV(wordCountReportData, "D:\\result.csv");
     }
 }
