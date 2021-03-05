@@ -44,6 +44,7 @@ public class GitUtil {
         }
         File file = new File(localPath);
         if (file.exists()) {
+            log.warn("file exist");
             FileUtil.deleteFile(file);
         }
         log.info("开始下载: {}", url);
