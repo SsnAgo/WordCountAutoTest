@@ -3,8 +3,11 @@ package auto.test.wordcount;
 import auto.test.wordcount.executor.Executor;
 import auto.test.wordcount.executor.JavaExecutor;
 import auto.test.wordcount.judge.Judge;
+import auto.test.wordcount.judge.JudgeItem;
+import auto.test.wordcount.judge.JudgeResult;
 import auto.test.wordcount.judge.WordCountJudge;
 import auto.test.wordcount.report.ReportData;
+import auto.test.wordcount.report.WordCountReportData;
 import auto.test.wordcount.utils.CSVUtil;
 import auto.test.wordcount.utils.FileUtil;
 import auto.test.wordcount.utils.GitUtil;
@@ -15,6 +18,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static auto.test.wordcount.utils.CSVUtil.exportToCSV;
 
 /**
  * @author <a href="mailto:410486047@qq.com">Grey</a>
@@ -27,10 +32,10 @@ public class Client {
     /**
      * 在download文件夹下新建一个以当前时间戳为文件名的文件夹，然后把项目克隆到这个目录
      * 返回克隆后，仓库的绝对路径地址：
-     * 比如：D:/git/download/1614926251715/
+     * 比如：D:\\git\\download\\1614926251715\\
      * git地址是：https://github.com/kofyou/PersonalProject-Java
-     * 则调用这个方法，会在D:/git/download/1614926251715/ 目录下生成一个 PersonalProject-Java仓库
-     * 返回：D:/git/download/1614926251715/PersonalProject-Java 这个路径
+     * 则调用这个方法，会在D:\\git\\download\\1614926251715\\目录下生成一个 PersonalProject-Java仓库
+     * 返回：D:\\git\\download\\1614926251715\\PersonalProject-Java 这个路径
      *
      * @param url git地址 注意：必须是公有仓库!!
      * @return 克隆后的绝对路径
@@ -55,6 +60,10 @@ public class Client {
 
     public static void main(String[] args) {
         String repo = clone("https://github.com/kofyou/PersonalProject-Java.git");
+        if (repo == null) {
+            log.error("fail to clone project!!!!");
+            return;
+        }
         // TODO
         // 遍历repo这个绝对路径下的所有文件夹，拿到学生的学号信息
 
@@ -93,24 +102,17 @@ public class Client {
         Judge judge = new WordCountJudge();
         Result result = judge.judge(outputPath, answer1);
 
-
+        // TODO judge to result
+        List<JudgeResult> results = new ArrayList<>();
+        ReportData reportData = new WordCountReportData(results);
         // 导出到CSV
-        String resultPath = "D:\\git\\WordCountAutoTest\\download\\1614926251715" + File.separator + "result.csv";
-        ReportData reportData = new ReportData() {
-            @Override
-            public String[] headers() {
-                return new String[]{"ID", "score"};
-            }
-
-            @Override
-            public List<List<String>> records() {
-                final List<List<String>> records = new ArrayList<>();
-                // TODO 这里需要考虑通过率
-                records.add(Arrays.asList(studentId, result.isPass() ? "100" : "0"));
-                return records;
-            }
-        };
-        CSVUtil.exportToCSV(reportData, resultPath);
+        exportToCSV(reportData, generateResultPath(repo));
     }
 
+
+    private static String generateResultPath(String repo) {
+        // repo : D:\\git\\download\\1614926251715\\PersonalProject-Java
+        // -> D:\\git\\download\\1614926251715\\
+        return repo.substring(0, repo.lastIndexOf("\\")) + File.separator + "result" + File.separator + "result.csv";
+    }
 }
