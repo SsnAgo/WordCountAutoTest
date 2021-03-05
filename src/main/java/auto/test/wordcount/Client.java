@@ -4,7 +4,10 @@ import auto.test.wordcount.executor.Executor;
 import auto.test.wordcount.executor.JavaExecutor;
 import auto.test.wordcount.judge.Judge;
 import auto.test.wordcount.judge.WordCountJudge;
+import auto.test.wordcount.report.ReportData;
 import auto.test.wordcount.utils.CSVUtil;
+import auto.test.wordcount.utils.FileUtil;
+import auto.test.wordcount.utils.GitUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,20 +24,40 @@ import java.util.List;
 public class Client {
     private static final Logger log = LoggerFactory.getLogger(Client.class);
 
-    public static void main(String[] args) {
-        // TODO 以下注释的方法是clone仓库，由于github不稳定，clone时好时坏，以下代码在网络通顺的时候是没问题的
-        //  所以先假设代码clone下来了，
-        // 目录结构  download/1614926251715/PersonalProject-Java/学号/src/WordCount.java
-        /*File downloadFolder = new File("download");
-        if (!downloadFolder.exists()) {
-            downloadFolder.mkdir();
+    /**
+     * 在download文件夹下新建一个以当前时间戳为文件名的文件夹，然后把项目克隆到这个目录
+     * 返回克隆后，仓库的绝对路径地址：
+     * 比如：D:/git/download/1614926251715/
+     * git地址是：https://github.com/kofyou/PersonalProject-Java
+     * 则调用这个方法，会在D:/git/download/1614926251715/ 目录下生成一个 PersonalProject-Java仓库
+     * 返回：D:/git/download/1614926251715/PersonalProject-Java 这个路径
+     *
+     * @param url git地址 注意：必须是公有仓库!!
+     * @return 克隆后的绝对路径
+     */
+    public static String clone(String url) {
+        try {
+            File downloadFolder = new File("download");
+            if (!downloadFolder.exists()) {
+                downloadFolder.mkdir();
+            }
+            String subFolder = String.valueOf(System.currentTimeMillis());
+            FileUtil.createFolder(downloadFolder.getAbsolutePath(), subFolder);
+            String allSourceCodePath = downloadFolder.getAbsolutePath() + File.separator + subFolder;
+            GitUtil.cloneRepo(url, allSourceCodePath, false);
+            return allSourceCodePath + File.separator + url.replace(".git", "").substring(url.lastIndexOf("/") + 1);
+        } catch (Exception e) {
+            log.error("clone {} , error {}", url, e.getMessage());
         }
-        String subFolder = String.valueOf(System.currentTimeMillis());
+        return null;
+    }
 
-        FileUtil.createFolder(downloadFolder.getAbsolutePath(), subFolder);
-        String allSourceCodePath = downloadFolder.getAbsolutePath() + File.separator + subFolder;
-        String url = "https://github.com/GreyZeng/wordcount.git";
-        GitUtil.cloneRepo(url, allSourceCodePath, false);*/
+
+    public static void main(String[] args) {
+        String repo = clone("https://github.com/kofyou/PersonalProject-Java.git");
+        // TODO
+        // 遍历repo这个绝对路径下的所有文件夹，拿到学生的学号信息
+
 
         // TODO
         // studentId 根据PersonalProject-Java目录下名称生成
@@ -76,7 +99,7 @@ public class Client {
         ReportData reportData = new ReportData() {
             @Override
             public String[] headers() {
-                return new String[]{"name", "score"};
+                return new String[]{"ID", "score"};
             }
 
             @Override
@@ -88,7 +111,6 @@ public class Client {
             }
         };
         CSVUtil.exportToCSV(reportData, resultPath);
-
-
     }
+
 }

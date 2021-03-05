@@ -1,4 +1,4 @@
-package auto.test.wordcount;
+package auto.test.wordcount.report;
 
 import java.util.List;
 

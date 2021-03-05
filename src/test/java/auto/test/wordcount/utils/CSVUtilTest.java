@@ -1,6 +1,6 @@
 package auto.test.wordcount.utils;
 
-import auto.test.wordcount.ReportData;
+import auto.test.wordcount.report.ReportData;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
