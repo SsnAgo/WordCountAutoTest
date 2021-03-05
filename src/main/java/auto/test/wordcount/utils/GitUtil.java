@@ -47,6 +47,7 @@ public class GitUtil {
             FileUtil.deleteFile(file);
         }
         log.info("开始下载: {}", url);
+        // 需要公用仓库才能clone，私有仓库需要用户名密码
         CloneCommand cloneCommand = Git.cloneRepository().setURI(url);
         try {
             cloneCommand.setDirectory(new File(localPath)).setTimeout(100).call();
