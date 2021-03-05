@@ -4,6 +4,9 @@ package auto.test.wordcount.utils;
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 
@@ -15,6 +18,8 @@ import java.io.File;
  * @since
  */
 public class GitUtil {
+    private static final Logger log = LoggerFactory.getLogger(GitUtil.class);
+
     /**
      * 克隆url到指定目录
      * eg
@@ -32,7 +37,7 @@ public class GitUtil {
      *                   如果为false，则clone后的文件夹会保留下来
      * @return 是否克隆成功, 成功为true，不成功为false
      */
-    public static boolean cloneRepo(String url, String localPath, boolean pathAsRoot) throws GitAPIException {
+    public static boolean cloneRepo(String url, String localPath, boolean pathAsRoot) {
         if (!pathAsRoot) {
             String repoName = url.substring(url.lastIndexOf("/") + 1).replace(".git", "");
             FileUtil.createFolder(localPath, repoName);
@@ -42,10 +47,15 @@ public class GitUtil {
         if (file.exists()) {
             FileUtil.deleteFile(file);
         }
-        System.out.println("开始下载:" + url);
+        log.info("开始下载: {}", url);
         CloneCommand cloneCommand = Git.cloneRepository().setURI(url);
-        cloneCommand.setDirectory(new File(localPath)).setTimeout(60).call();
-        System.out.println("下载完成:" + url);
+        try {
+            cloneCommand.setDirectory(new File(localPath)).setTimeout(100).call();
+        } catch (GitAPIException e) {
+            log.error("下载错误: {} {}", url, e.getMessage());
+            return false;
+        }
+        log.info("下载完成: {}", url);
         return true;
     }
 

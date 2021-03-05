@@ -1,11 +1,11 @@
 package auto.test.wordcount.judge;
 
 import auto.test.wordcount.Result;
-import auto.test.wordcount.utils.FileUtil;
 
 import java.io.IOException;
+import java.util.Objects;
 
-import static auto.test.wordcount.utils.FileUtil.isSameContent;
+import static auto.test.wordcount.utils.FileUtil.content;
 
 /**
  * wordcount作业的Judge
@@ -25,7 +25,9 @@ public class WordCountJudge implements Judge {
         Result result = new Result();
         result.result(resultPath).answer(answerPath);
         try {
-            result.pass(isSameContent(resultPath, answerPath, "UTF-8"));
+            String contentResult = content(resultPath, "UTF-8").replaceAll("\r", "");
+            String answerResult = content(answerPath, "UTF-8").replaceAll("\r", "");
+            result.pass(Objects.equals(contentResult, answerResult));
         } catch (IOException e) {
             e.printStackTrace();
             result.pass(false);

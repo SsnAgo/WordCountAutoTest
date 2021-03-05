@@ -2,11 +2,22 @@ package auto.test.wordcount;
 
 /**
  * TODO 这个类的设计需要再考虑，暂不抽象，目前先实现功能
+ *
  * @author <a href="mailto:410486047@qq.com">Grey</a>
  * @date 2021/3/4
  * @since
  */
 public class Result {
+    @Override
+    public String toString() {
+        return "Result{" +
+                "src='" + src + '\'' +
+                ", result='" + result + '\'' +
+                ", answer='" + answer + '\'' +
+                ", pass=" + pass +
+                '}';
+    }
+
     /**
      * 代码目录
      */

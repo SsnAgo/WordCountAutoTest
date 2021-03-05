@@ -38,7 +38,7 @@ public class FileUtil {
      * @return
      */
     public static String content(String filePath, String encoding) throws IOException {
-        return new String(readAllBytes(new File(filePath).toPath()), forName(encoding));
+        return  new String(readAllBytes(new File(filePath).toPath()), forName(encoding));
     }
 
     /**
