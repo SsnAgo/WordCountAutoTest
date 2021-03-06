@@ -3,12 +3,10 @@ package auto.test.wordcount;
 import auto.test.wordcount.executor.Executor;
 import auto.test.wordcount.executor.JavaExecutor;
 import auto.test.wordcount.judge.Judge;
-import auto.test.wordcount.judge.JudgeItem;
 import auto.test.wordcount.judge.JudgeResult;
 import auto.test.wordcount.judge.WordCountJudge;
 import auto.test.wordcount.report.ReportData;
 import auto.test.wordcount.report.WordCountReportData;
-import auto.test.wordcount.utils.CSVUtil;
 import auto.test.wordcount.utils.FileUtil;
 import auto.test.wordcount.utils.GitUtil;
 import org.slf4j.Logger;
@@ -16,8 +14,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static auto.test.wordcount.utils.CSVUtil.exportToCSV;
 
@@ -59,13 +58,20 @@ public class Client {
 
 
     public static void main(String[] args) {
+        // 克隆代码仓库
         String repo = clone("https://github.com/kofyou/PersonalProject-Java.git");
         if (repo == null) {
             log.error("fail to clone project!!!!");
             return;
         }
-        // TODO
-        // 遍历repo这个绝对路径下的所有文件夹，拿到学生的学号信息
+
+        // 遍历仓库下的所有文件夹，拿到学生的学号信息
+        // Key为学号，Value是该学号学生的代码路径
+        Map<String, String> studentSrcFolderMap = new HashMap<>();
+        List<String> subFolders = FileUtil.listFolders(repo);
+
+
+        List<JudgeResult> results = new ArrayList<>();
 
 
         // TODO
@@ -103,7 +109,7 @@ public class Client {
         Result result = judge.judge(outputPath, answer1);
 
         // TODO judge to result
-        List<JudgeResult> results = new ArrayList<>();
+
         ReportData reportData = new WordCountReportData(results);
         // 导出到CSV
         exportToCSV(reportData, generateResultPath(repo));
