@@ -68,8 +68,11 @@ public class Client {
         // 遍历仓库下的所有文件夹，拿到学生的学号信息
         // Key为学号，Value是该学号学生的代码路径
         Map<String, String> studentSrcFolderMap = new HashMap<>();
+
         List<String> subFolders = FileUtil.listFolders(repo);
 
+
+        Map<String, Map<String, String>> answer = new HashMap<>();
 
         List<JudgeResult> results = new ArrayList<>();
 

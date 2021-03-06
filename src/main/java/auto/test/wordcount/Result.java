@@ -14,7 +14,7 @@ public class Result {
                 "src='" + src + '\'' +
                 ", result='" + result + '\'' +
                 ", answer='" + answer + '\'' +
-                ", pass=" + pass +
+                ", score=" + score +
                 '}';
     }
 
@@ -30,10 +30,7 @@ public class Result {
      * 测试用例
      */
     private String answer;
-    /**
-     * 是否通过
-     */
-    private boolean pass;
+    private int score;
 
     public String getSrc() {
         return src;
@@ -62,12 +59,12 @@ public class Result {
         return this;
     }
 
-    public boolean isPass() {
-        return pass;
+    public int getScore() {
+        return score;
     }
 
-    public Result pass(boolean pass) {
-        this.pass = pass;
+    public Result score(int score) {
+        this.score = score;
         return this;
     }
 }
