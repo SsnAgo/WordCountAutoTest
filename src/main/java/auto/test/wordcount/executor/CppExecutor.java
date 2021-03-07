@@ -1,5 +1,8 @@
 package auto.test.wordcount.executor;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * C++执行程序
  * @author <a href="mailto:410486047@qq.com">Grey</a>
@@ -16,5 +19,10 @@ public class CppExecutor implements Executor {
     public void exec(String src, String input) {
         // TODO
 
+    }
+
+    @Override
+    public  List<String> suffix() {
+        return Arrays.asList("cpp", "c");
     }
 }

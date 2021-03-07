@@ -2,6 +2,8 @@ package auto.test.wordcount.executor;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 
 import static auto.test.wordcount.utils.CmdUtil.cmd;
 import static auto.test.wordcount.utils.FileUtil.getFolder;
@@ -34,6 +36,11 @@ public class JavaExecutor implements Executor {
         String defaultClassPath = getFolder(mainFile);
         String mainClass = getCompileClassName(mainFile);
         java(defaultClassPath, mainClass, input);
+    }
+
+    @Override
+    public List<String> suffix() {
+        return Collections.singletonList("java");
     }
 
 
