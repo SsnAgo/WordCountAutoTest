@@ -23,4 +23,12 @@ public class CasesTest {
         WordCountTestCasesGenerator test = new WordCountTestCasesGenerator(num,tmp.getAbsolutePath());
         System.out.println(test.getTestCases());
     }
+    /**
+     * 测试
+     */
+    @Test
+    public void test(){
+
+        System.out.println("");
+    }
 }
