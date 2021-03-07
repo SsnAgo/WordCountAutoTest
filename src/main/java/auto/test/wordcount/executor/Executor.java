@@ -9,14 +9,15 @@ public interface Executor {
     /**
      * 编译程序
      *
-     * @param src    源码目录
+     * @param src 源码目录
      */
     void compile(String src);
+
     /**
      * 执行程序
      *
-     * @param src    源码目录
-     * @param input  测试用例
+     * @param src  源码目录
+     * @param args 命令参数
      */
-    void exec(String src, String input);
+    void exec(String src, String args);
 }

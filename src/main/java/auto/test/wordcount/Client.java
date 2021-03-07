@@ -1,15 +1,26 @@
 package auto.test.wordcount;
 
+import auto.test.wordcount.executor.Executor;
+import auto.test.wordcount.executor.ExecutorProxy;
+import auto.test.wordcount.executor.JavaExecutor;
+import auto.test.wordcount.judge.Judge;
+import auto.test.wordcount.judge.JudgeResult;
+import auto.test.wordcount.judge.WordCountJudge;
 import auto.test.wordcount.judge.WordCountTestCasesGenerator;
+import auto.test.wordcount.report.ReportData;
+import auto.test.wordcount.report.WordCountReportData;
 import auto.test.wordcount.utils.FileUtil;
 import auto.test.wordcount.utils.GitUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.IOException;
+import java.lang.reflect.Proxy;
+import java.util.*;
+
+import static auto.test.wordcount.utils.CSVUtil.exportToCSV;
+import static java.lang.reflect.Proxy.newProxyInstance;
 
 /**
  * @author <a href="mailto:410486047@qq.com">Grey</a>
@@ -56,23 +67,49 @@ public class Client {
             log.error("请设置仓库目录");
             return;
         }
-        // 遍历仓库下的所有学生学号命名的文件夹，在这些文件夹下面建好一个output文件夹，用于存放学生程序的输出结果文件
-        generateOutput(repo);
 
+        // 默认测试用例的数量
+        int testCaseNum = 5;
 
-        // 默认生成十个测试用例
         // 如果用例准备好了，请返回准备好的用例信息
-        Map<String, Map<String, String>> testCases = generateTestCases(repo);
+        Map<String, Map<String, String>> testCases = generateTestCases(repo, testCaseNum);
 
+        // 遍历仓库下的所有学生学号命名的文件夹，在这些文件夹下面建好一个output文件夹，用于存放学生程序的输出结果文件
+        generateOutput(repo, testCaseNum);
 
         // Key为学号，Value是该学号学生的代码路径
-        Map<String, String> studentSrcFolderMap = new HashMap<>();
-        /*Map<String, Map<String, String>> answer = new HashMap<>();
+        Map<String, String> src = generateSrc(repo);
+        // 根据src目录获取对应的Executor，默认是Java Executor
+
+        for (String studentId : src.keySet()) {
+            // main方法所在文件
+            Executor executor = findExecutor(src.get(studentId));
+            String mainFunFile = mainFunctionFilesLocation(src.get(studentId));
+            executor.compile(mainFunFile);
+            for (String caseId : testCases.keySet()) {
+                // TODO 以下代码需要优化！！！！！
+                Map<String, String> map = testCases.get(caseId);
+                Set<Map.Entry<String, String>> entries = map.entrySet();
+                Iterator<Map.Entry<String, String>> iterator = entries.iterator();
+                String key = null;
+                String answer;
+                // iterator有且仅有一条记录
+                while (iterator.hasNext()) {
+                    Map.Entry<String, String> next = iterator.next();
+                    key = next.getKey();
+                    answer = next.getValue();
+                }
+                executor.exec(mainFunFile, key + " " + findOutput(src.get(studentId), caseId));
+            }
+        }
+
+
+
+       /*
+        Map<String, Map<String, String>> answer = new HashMap<>();
 
         List<JudgeResult> results = new ArrayList<>();
-
-
-        // TODO
+       // TODO
         // studentId 根据PersonalProject-Java目录下名称生成
         String studentId = "890177";
 
@@ -121,23 +158,70 @@ public class Client {
         exportToCSV(reportData, generateResultPath(repo));*/
     }
 
+    private static String findOutput(String src, String caseId) {
+        String parent = cn.hutool.core.io.FileUtil.getParent(src, 1);
+        return new File(new File(parent, "output"), caseId + ".txt").getAbsolutePath();
+    }
+
+    // TODO
+    // 查看srcLocation的后缀名来选择用哪个Executor
+    // 默认先用JavaExecutor
+    private static Executor findExecutor(String srcLocation) {
+        Executor executor = new JavaExecutor();
+        ExecutorProxy executorProxy = new ExecutorProxy(executor);
+        // 动态代理获取运行时间
+        return (Executor) newProxyInstance(executor.getClass().getClassLoader(), new Class<?>[]{Executor.class}, executorProxy);
+    }
+
+    // main方法所在路径
+    public static String mainFunctionFilesLocation(String src) {
+        return new File(src, "WordCount.java").getAbsolutePath();
+    }
+
+    private static Map<String, String> generateSrc(String repo) {
+        Map<String, String> src = new HashMap<>();
+        List<String> allFolders = FileUtil.listFolders(repo);
+        for (String folder : allFolders) {
+            src.put(new File(folder).getName(), new File(folder, "src").getAbsolutePath());
+        }
+        return src;
+    }
+
     // repo : C:\git\WordCountAutoTest\download\1614954391268\PersonalProject-Java
     // 则生成测试用例的文件夹为 ： C:\git\WordCountAutoTest\download\1614954391268\cases
     // 对应答案的文件夹为：C:\git\WordCountAutoTest\download\1614954391268\answers
-    private static Map<String, Map<String, String>> generateTestCases(String repo) {
-        String parent = cn.hutool.core.io.FileUtil.getParent(repo, 1);
-        WordCountTestCasesGenerator generator = new WordCountTestCasesGenerator(6, parent);
-        return generator.getTestCases();
+    private static Map<String, Map<String, String>> generateTestCases(String repo, int testCaseNum) {
+        // TODO
+        /*String parent = cn.hutool.core.io.FileUtil.getParent(repo, 1);
+        WordCountTestCasesGenerator generator = new WordCountTestCasesGenerator(testCaseNum, parent);
+        return generator.getTestCases();*/
+        Map<String, Map<String, String>> map = new HashMap<>();
+        String cases = "C:\\git\\WordCountAutoTest\\download\\1614954391268\\cases\\";
+        String answers = "C:\\git\\WordCountAutoTest\\download\\1614954391268\\answers\\";
+        for (int i = 1; i <= testCaseNum; i++) {
+            Map<String, String> item = new HashMap<>();
+            item.put(cases + String.valueOf(i) + ".txt", answers + String.valueOf(i) + ".txt");
+            map.put(String.valueOf(i), item);
+        }
+        return map;
     }
 
-    private static void generateOutput(String repo) {
+    private static void generateOutput(String repo, int testCaseNum) {
         List<String> subFolders = FileUtil.listFolders(repo);
         for (String sub : subFolders) {
             File f = new File(sub, "output");
             if (!f.exists()) {
                 f.mkdir();
             }
+            for (int i = 1; i <= testCaseNum; i++) {
+                try {
+                    new File(f.getAbsolutePath(), i + ".txt").createNewFile();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
+
     }
 
     private static String preparePath(boolean needClone) {

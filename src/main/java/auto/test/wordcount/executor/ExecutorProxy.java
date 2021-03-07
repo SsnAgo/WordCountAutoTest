@@ -18,8 +18,8 @@ public class ExecutorProxy implements InvocationHandler {
 
     // 程序运行时间
     // TODO 使用代理获得程序运行时间的方式，后续需要测试和优化
-    private Long runtime; 
-    
+    private Long runtime;
+
     public ExecutorProxy(Executor executor) {
         this.executor = executor;
     }
@@ -30,13 +30,16 @@ public class ExecutorProxy implements InvocationHandler {
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        log.info("开始执行耗时统计");
-        long start = System.nanoTime();
-        Object o = method.invoke(executor, args);
-        
-        runtime = System.nanoTime() - start;
-        log.info("程序耗时：" + runtime);
-
-        return o;
+        // 只拦截exec方法
+        if ("exec".equals(method.getName())) {
+            log.info("开始执行耗时统计");
+            long start = System.nanoTime();
+            Object o = method.invoke(executor, args);
+            runtime = System.nanoTime() - start;
+            log.info("程序耗时：" + runtime);
+            return o;
+        } else {
+            return method.invoke(executor, args);
+        }
     }
 }

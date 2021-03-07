@@ -122,7 +122,7 @@ public class FileUtil {
      * @return
      */
     public static String getFolder(String filePath) {
-        return filePath.substring(0, filePath.lastIndexOf(File.separator));
+        return cn.hutool.core.io.FileUtil.getParent(filePath, 1);
     }
 
 
