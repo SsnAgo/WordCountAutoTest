@@ -3,10 +3,7 @@ package auto.test.wordcount;
 import auto.test.wordcount.executor.Executor;
 import auto.test.wordcount.executor.ExecutorProxy;
 import auto.test.wordcount.executor.JavaExecutor;
-import auto.test.wordcount.judge.Judge;
-import auto.test.wordcount.judge.JudgeItem;
-import auto.test.wordcount.judge.JudgeResult;
-import auto.test.wordcount.judge.WordCountJudge;
+import auto.test.wordcount.judge.*;
 import auto.test.wordcount.report.ReportData;
 import auto.test.wordcount.report.WordCountReportData;
 import auto.test.wordcount.utils.ClassUtils;
@@ -141,9 +138,11 @@ public class Client {
         return new File(new File(parent, "output"), caseId + ".txt").getAbsolutePath();
     }
 
-    // TODO
     // 查看srcLocation的后缀名来选择用哪个Executor
     private static Executor findExecutor(String srcLocation) throws Exception {
+        // FIXME
+        // srcLocation : C:\git\WordCountAutoTest\download\1614954391268\PersonalProject-Java\890177\src
+        // 需要遍历srcLocation目录下的文件，看下是以什么结尾的
         String suffix = srcLocation.substring(srcLocation.lastIndexOf(".") + 1);
         Executor executor = null;
         Set<Class<?>> classes;
@@ -198,10 +197,10 @@ public class Client {
     // 对应答案的文件夹为：C:\git\WordCountAutoTest\download\1614954391268\answers
     private static Map<String, Map<String, String>> generateTestCases(String repo, int testCaseNum) {
         // TODO
-        /*String parent = cn.hutool.core.io.FileUtil.getParent(repo, 1);
+        String parent = cn.hutool.core.io.FileUtil.getParent(repo, 1);
         WordCountTestCasesGenerator generator = new WordCountTestCasesGenerator(testCaseNum, parent);
-        return generator.getTestCases();*/
-        Map<String, Map<String, String>> map = new HashMap<>();
+        return generator.getTestCases();
+       /* Map<String, Map<String, String>> map = new HashMap<>();
         String cases = "C:\\git\\WordCountAutoTest\\download\\1614954391268\\cases\\";
         String answers = "C:\\git\\WordCountAutoTest\\download\\1614954391268\\answers\\";
         for (int i = 1; i <= testCaseNum; i++) {
@@ -209,7 +208,7 @@ public class Client {
             item.put(cases + String.valueOf(i) + ".txt", answers + String.valueOf(i) + ".txt");
             map.put(String.valueOf(i), item);
         }
-        return map;
+        return map;*/
     }
 
     private static void generateOutput(String repo, int testCaseNum) {
