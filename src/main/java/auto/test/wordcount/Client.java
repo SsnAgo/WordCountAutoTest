@@ -9,6 +9,7 @@ import auto.test.wordcount.judge.JudgeResult;
 import auto.test.wordcount.judge.WordCountJudge;
 import auto.test.wordcount.report.ReportData;
 import auto.test.wordcount.report.WordCountReportData;
+import auto.test.wordcount.utils.ClassUtils;
 import auto.test.wordcount.utils.FileUtil;
 import auto.test.wordcount.utils.GitUtil;
 import org.slf4j.Logger;
@@ -16,6 +17,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.*;
 
 import static auto.test.wordcount.utils.CSVUtil.exportToCSV;
@@ -85,7 +88,13 @@ public class Client {
         List<JudgeResult> results = new ArrayList<>();
         for (String studentId : src.keySet()) {
             // main方法所在文件
-            Executor executor = findExecutor(src.get(studentId));
+            Executor executor = null;
+            try {
+                executor = findExecutor(src.get(studentId));
+            } catch (Exception e) {
+                log.error("not executor found studentId: {}", studentId);
+                continue;
+            }
             String mainFunFile = mainFunctionFilesLocation(src.get(studentId));
             executor.compile(mainFunFile);
 
@@ -134,9 +143,37 @@ public class Client {
 
     // TODO
     // 查看srcLocation的后缀名来选择用哪个Executor
-    // 默认先用JavaExecutor
-    private static Executor findExecutor(String srcLocation) {
-        Executor executor = new JavaExecutor();
+    private static Executor findExecutor(String srcLocation) throws Exception {
+        String suffix = srcLocation.substring(srcLocation.lastIndexOf(".") + 1);
+        Executor executor = null;
+        Set<Class<?>> classes;
+        try {
+            classes = ClassUtils.getClasses("auto.test.wordcount.executor");
+        } catch (IOException e) {
+            classes = new HashSet<>();
+            log.error("find executors error");
+        }
+        out:
+        for (Class<?> aClass : classes) {
+            try {
+                final Method getSuffix = aClass.getMethod("suffix");
+                final List<String> suffixs = (List<String>) getSuffix.invoke(aClass.newInstance());
+                for (String s : suffixs) {
+                    if (s.equals(suffix)) {
+                        executor = (Executor) aClass.newInstance();
+                        break out;
+                    }
+                }
+            } catch (Exception e) {
+                log.warn("find executor.suffix error");
+                break;
+            }
+
+        }
+        if (null == executor) {
+            log.error("not found executor");
+            throw new Exception("not found executor");
+        }
         ExecutorProxy executorProxy = new ExecutorProxy(executor);
         // 动态代理获取运行时间
         return (Executor) newProxyInstance(executor.getClass().getClassLoader(), new Class<?>[]{Executor.class}, executorProxy);

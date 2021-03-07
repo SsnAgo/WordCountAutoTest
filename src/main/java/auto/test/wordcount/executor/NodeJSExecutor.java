@@ -1,5 +1,8 @@
 package auto.test.wordcount.executor;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * NodeJS执行程序
  *
@@ -17,5 +20,10 @@ public class NodeJSExecutor implements Executor {
     public void exec(String src, String input) {
         // TODO
 
+    }
+
+    @Override
+    public List<String> suffix() {
+        return Arrays.asList("js", "ts");
     }
 }

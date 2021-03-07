@@ -1,6 +1,8 @@
 package auto.test.wordcount.executor;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 
 import static auto.test.wordcount.utils.CmdUtil.cmd;
 
@@ -15,6 +17,11 @@ public class PythonExecutor implements Executor {
     @Override
     public void compile(String src) {
 
+    }
+
+    @Override
+    public List<String> suffix() {
+        return Collections.singletonList("py");
     }
 
     @Override
