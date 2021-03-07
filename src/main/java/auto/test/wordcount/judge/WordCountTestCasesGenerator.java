@@ -1,7 +1,6 @@
 package auto.test.wordcount.judge;
 
 import auto.test.wordcount.DataGenerator;
-import auto.test.wordcount.utils.FileUtil;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -11,49 +10,48 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * 生成wordcount程序的测试用例
  * @author <a href="mailto:18965375150@163.com">siberia0015</a>
  * @date 2021/3/6
  * @since
  */
-public class WordCountJudge2 {
-    private String srcPath;
-    private String studentNo;
+public class WordCountTestCasesGenerator {
     private int nums;
+    private String repo;
     private Map<String, Map<String, String>> answer;
     public Map<String, Map<String, String>> getAnswer() {return answer;}
-    public WordCountJudge2(String srcPath, String studentNo, int nums){
-        this.srcPath = srcPath;
-        this.studentNo = studentNo;
+    public WordCountTestCasesGenerator(int nums,String repo){
         this.nums = nums;
-        answer  = testCases(nums);
+        this.repo = repo;
+        answer  = testCases();
     }
-
-    private Map<String, Map<String, String>> testCases(int nums){
-        // TODO
+    private Map<String, Map<String, String>> testCases(){
         // 生成nums数量的题目
         // config的key是题目编号，value的key是题目位置，value的value是答案的位置
         // 题目和答案位置一律放在某个写死的路径里面
         // 目前先只管生成题目，答案一律为空文件
 
         // 生成目录
-        String stamp = String.valueOf(System.currentTimeMillis());
-        File caseFolder = new File("download\\" + stamp + "\\cases\\");
+        File root = new File(repo);
+        if (!root.exists()) {
+            root.mkdir();
+        }
+
+        File caseFolder = new File(root.getAbsolutePath(), "cases");// new File("download\\" + stamp + "\\cases\\");
         if (!caseFolder.exists()) {
             caseFolder.mkdirs();
         }
-        File answerFolder = new File("download\\" + stamp + "\\answers\\");
+        File answerFolder = new File(root.getAbsolutePath() , "answers");
         if (!answerFolder.exists()) {
             answerFolder.mkdirs();
         }
-        String casePath = "download\\" + stamp + "\\cases\\";
-        String answerPath = "download\\" + stamp + "\\answers\\";
         int maxLength = 1000000;
         int minLength = 100;
         Map<String, Map<String,String>> config = new HashMap<>(nums);
         int count = 1;
         while (count <= nums) {
             Map<String, String> question = new HashMap<>();
-            question.put(casePath+count+".txt", answerPath+count+".txt");
+            question.put(caseFolder + File.separator+count+".txt", answerFolder + File.separator+count+".txt");
             config.put(count + "", question);
             // 写入题目文件
             int length = (int)(1+Math.random()*(maxLength-minLength+1)); //生成随机长度
@@ -61,7 +59,7 @@ public class WordCountJudge2 {
             BufferedWriter bw;
             try{
                 // String encoding = "UTF-8";
-                File file = new File(casePath+count+".txt");
+                File file = new File(caseFolder,count+".txt");
                 if (!file.exists()) {
                     file.createNewFile();
                 }
@@ -73,7 +71,7 @@ public class WordCountJudge2 {
                 e.printStackTrace();
             }
             //写入答案文件
-            File file = new File(answerPath+count+".txt");
+            File file = new File(answerFolder ,count+".txt");
             try {
                 file.createNewFile();
             } catch (IOException e) {
