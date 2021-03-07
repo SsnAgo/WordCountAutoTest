@@ -1,10 +1,9 @@
 package auto.test.wordcount;
 
-import auto.test.wordcount.judge.WordCountJudge;
-import auto.test.wordcount.judge.WordCountJudge2;
+import auto.test.wordcount.judge.WordCountTestCasesGenerator;
 import org.junit.jupiter.api.Test;
 
-import java.util.Map;
+import java.io.File;
 
 /**
  * @author <a href="mailto:18965375150@163.com">siberia0015</a>
@@ -18,7 +17,10 @@ public class CasesTest {
     @Test
     public void casesTest(){
         int num = 5;
-        WordCountJudge2 test = new WordCountJudge2("", "", num);
+        File tmp = new File("download");
+        tmp.mkdir();
+
+        WordCountTestCasesGenerator test = new WordCountTestCasesGenerator(num,tmp.getAbsolutePath());
         System.out.println(test.getAnswer());
     }
 }
