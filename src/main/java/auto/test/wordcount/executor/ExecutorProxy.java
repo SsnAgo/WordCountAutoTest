@@ -15,7 +15,9 @@ import java.lang.reflect.Method;
 public class ExecutorProxy implements InvocationHandler {
     private Executor executor;
     private static final Logger log = LoggerFactory.getLogger(ExecutorProxy.class);
+
     // 程序运行时间
+    // TODO 使用代理获得程序运行时间的方式，后续需要测试和优化
     private Long runtime; 
     
     public ExecutorProxy(Executor executor) {
