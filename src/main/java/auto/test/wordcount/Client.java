@@ -1,26 +1,15 @@
 package auto.test.wordcount;
 
-import auto.test.wordcount.executor.Executor;
-import auto.test.wordcount.executor.ExecutorProxy;
-import auto.test.wordcount.executor.JavaExecutor;
-import auto.test.wordcount.judge.Judge;
-import auto.test.wordcount.judge.JudgeResult;
-import auto.test.wordcount.judge.WordCountJudge;
-import auto.test.wordcount.report.ReportData;
-import auto.test.wordcount.report.WordCountReportData;
+import auto.test.wordcount.judge.WordCountTestCasesGenerator;
 import auto.test.wordcount.utils.FileUtil;
 import auto.test.wordcount.utils.GitUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.lang.reflect.Proxy;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static auto.test.wordcount.utils.CSVUtil.exportToCSV;
 
 /**
  * @author <a href="mailto:410486047@qq.com">Grey</a>
@@ -58,23 +47,27 @@ public class Client {
         return null;
     }
 
-
     public static void main(String[] args) {
+
         // 克隆代码仓库
-        String repo = clone("https://github.com/kofyou/PersonalProject-Java.git");
+        // 由于网络原因，clone经常失败，可以先手动下载，如果要自动下载，则把needPath = true
+        String repo = preparePath(false);
         if (repo == null) {
-            log.error("fail to clone project!!!!");
+            log.error("请设置仓库目录");
             return;
         }
+        // 遍历仓库下的所有学生学号命名的文件夹，在这些文件夹下面建好一个output文件夹，用于存放学生程序的输出结果文件
+        generateOutput(repo);
 
-        // 遍历仓库下的所有文件夹，拿到学生的学号信息
+
+        // 默认生成十个测试用例
+        // 如果用例准备好了，请返回准备好的用例信息
+        Map<String, Map<String, String>> testCases = generateTestCases(repo);
+
+
         // Key为学号，Value是该学号学生的代码路径
         Map<String, String> studentSrcFolderMap = new HashMap<>();
-
-        List<String> subFolders = FileUtil.listFolders(repo);
-
-
-        Map<String, Map<String, String>> answer = new HashMap<>();
+        /*Map<String, Map<String, String>> answer = new HashMap<>();
 
         List<JudgeResult> results = new ArrayList<>();
 
@@ -104,7 +97,7 @@ public class Client {
         String answer1 = stds + File.separator + "std1.txt";
         String outputPath = srcPath + "\\output.txt";
         // 执行代码
-        
+
         Executor executor = new JavaExecutor();
         ExecutorProxy executorProxy = new ExecutorProxy(executor);
         // 动态代理获取运行时间
@@ -114,7 +107,7 @@ public class Client {
         proxyInstance.exec(mainFile, case1 + " " + outputPath);
         // 程序运行时间
         Long runtime = executorProxy.getRuntime();
-        log.info("程序运行时间 -- > "+runtime);
+        log.info("程序运行时间 -- > " + runtime);
 
 
         // Judge代码
@@ -125,7 +118,42 @@ public class Client {
 
         ReportData reportData = new WordCountReportData(results);
         // 导出到CSV
-        exportToCSV(reportData, generateResultPath(repo));
+        exportToCSV(reportData, generateResultPath(repo));*/
+    }
+
+    // repo : C:\git\WordCountAutoTest\download\1614954391268\PersonalProject-Java
+    // 则生成测试用例的文件夹为 ： C:\git\WordCountAutoTest\download\1614954391268\cases
+    // 对应答案的文件夹为：C:\git\WordCountAutoTest\download\1614954391268\answers
+    private static Map<String, Map<String, String>> generateTestCases(String repo) {
+        String parent = cn.hutool.core.io.FileUtil.getParent(repo, 1);
+        WordCountTestCasesGenerator generator = new WordCountTestCasesGenerator(6, parent);
+        return generator.getTestCases();
+    }
+
+    private static void generateOutput(String repo) {
+        List<String> subFolders = FileUtil.listFolders(repo);
+        for (String sub : subFolders) {
+            File f = new File(sub, "output");
+            if (!f.exists()) {
+                f.mkdir();
+            }
+        }
+    }
+
+    private static String preparePath(boolean needClone) {
+        String repo = "";
+        if (needClone) {
+            repo = clone("https://github.com/kofyou/PersonalProject-Java.git");
+        } else {
+            // 手动下载，指定下载仓库的目录
+            repo = "C:\\git\\WordCountAutoTest\\download\\1614954391268\\PersonalProject-Java";
+        }
+        if (repo == null) {
+            log.error("fail to clone project!!!!");
+            return null;
+        }
+        FileUtil.deleteFile(new File(repo, ".git"));
+        return repo;
     }
 
 

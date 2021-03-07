@@ -11,6 +11,7 @@ import java.util.Map;
 
 /**
  * 生成wordcount程序的测试用例
+ *
  * @author <a href="mailto:18965375150@163.com">siberia0015</a>
  * @date 2021/3/6
  * @since
@@ -18,14 +19,20 @@ import java.util.Map;
 public class WordCountTestCasesGenerator {
     private int nums;
     private String repo;
-    private Map<String, Map<String, String>> answer;
-    public Map<String, Map<String, String>> getAnswer() {return answer;}
-    public WordCountTestCasesGenerator(int nums,String repo){
+    private Map<String, Map<String, String>> testCases;
+
+    public Map<String, Map<String, String>> getTestCases() {
+        return testCases;
+    }
+
+    public WordCountTestCasesGenerator(int nums, String repo) {
         this.nums = nums;
         this.repo = repo;
-        answer  = testCases();
+        this.testCases = testCases();
     }
-    private Map<String, Map<String, String>> testCases(){
+
+    // TODO 如果用例和答案准备好了，请返回准备好的用例和答案信息，不需要重新新建测试用例和答案
+    private Map<String, Map<String, String>> testCases() {
         // 生成nums数量的题目
         // config的key是题目编号，value的key是题目位置，value的value是答案的位置
         // 题目和答案位置一律放在某个写死的路径里面
@@ -41,25 +48,25 @@ public class WordCountTestCasesGenerator {
         if (!caseFolder.exists()) {
             caseFolder.mkdirs();
         }
-        File answerFolder = new File(root.getAbsolutePath() , "answers");
+        File answerFolder = new File(root.getAbsolutePath(), "answers");
         if (!answerFolder.exists()) {
             answerFolder.mkdirs();
         }
         int maxLength = 1000000;
         int minLength = 100;
-        Map<String, Map<String,String>> config = new HashMap<>(nums);
+        Map<String, Map<String, String>> config = new HashMap<>(nums);
         int count = 1;
         while (count <= nums) {
             Map<String, String> question = new HashMap<>();
-            question.put(caseFolder + File.separator+count+".txt", answerFolder + File.separator+count+".txt");
+            question.put(caseFolder + File.separator + count + ".txt", answerFolder + File.separator + count + ".txt");
             config.put(count + "", question);
             // 写入题目文件
-            int length = (int)(1+Math.random()*(maxLength-minLength+1)); //生成随机长度
+            int length = (int) (1 + Math.random() * (maxLength - minLength + 1)); //生成随机长度
             String content = DataGenerator.generateContent(length); //生成随机字符串
             BufferedWriter bw;
-            try{
+            try {
                 // String encoding = "UTF-8";
-                File file = new File(caseFolder,count+".txt");
+                File file = new File(caseFolder, count + ".txt");
                 if (!file.exists()) {
                     file.createNewFile();
                 }
@@ -71,7 +78,7 @@ public class WordCountTestCasesGenerator {
                 e.printStackTrace();
             }
             //写入答案文件
-            File file = new File(answerFolder ,count+".txt");
+            File file = new File(answerFolder, count + ".txt");
             try {
                 file.createNewFile();
             } catch (IOException e) {

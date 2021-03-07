@@ -21,6 +21,6 @@ public class CasesTest {
         tmp.mkdir();
 
         WordCountTestCasesGenerator test = new WordCountTestCasesGenerator(num,tmp.getAbsolutePath());
-        System.out.println(test.getAnswer());
+        System.out.println(test.getTestCases());
     }
 }

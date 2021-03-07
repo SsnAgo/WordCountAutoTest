@@ -138,11 +138,11 @@ public class FileUtil {
             return new ArrayList<>();
         } else {
             List<String> result = new ArrayList<>();
-            String[] list = file.list();
-            for (String r : list) {
+            File[] list = file.listFiles();
+            for (File r : list) {
                 // 只要文件夹
-                if (new File(r).isDirectory()) {
-                    result.add(r);
+                if (r.isDirectory()) {
+                    result.add(r.getAbsolutePath());
                 }
             }
             return result;
