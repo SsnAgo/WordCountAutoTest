@@ -15,8 +15,15 @@ import java.lang.reflect.Method;
 public class ExecutorProxy implements InvocationHandler {
     private Executor executor;
     private static final Logger log = LoggerFactory.getLogger(ExecutorProxy.class);
+    // 程序运行时间
+    private Long runtime; 
+    
     public ExecutorProxy(Executor executor) {
         this.executor = executor;
+    }
+
+    public Long getRuntime() {
+        return runtime;
     }
 
     @Override
@@ -24,7 +31,10 @@ public class ExecutorProxy implements InvocationHandler {
         log.info("开始执行耗时统计");
         long start = System.nanoTime();
         Object o = method.invoke(executor, args);
-        log.info("程序耗时：" + (System.nanoTime() - start));
+        
+        runtime = System.nanoTime() - start;
+        log.info("程序耗时：" + runtime);
+
         return o;
     }
 }

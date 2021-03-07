@@ -1,6 +1,7 @@
 package auto.test.wordcount;
 
 import auto.test.wordcount.executor.Executor;
+import auto.test.wordcount.executor.ExecutorProxy;
 import auto.test.wordcount.executor.JavaExecutor;
 import auto.test.wordcount.judge.Judge;
 import auto.test.wordcount.judge.JudgeResult;
@@ -13,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -102,9 +104,17 @@ public class Client {
         String answer1 = stds + File.separator + "std1.txt";
         String outputPath = srcPath + "\\output.txt";
         // 执行代码
+        
         Executor executor = new JavaExecutor();
-        executor.compile(mainFile);
-        executor.exec(mainFile, case1 + " " + outputPath);
+        ExecutorProxy executorProxy = new ExecutorProxy(executor);
+        // 动态代理获取运行时间
+        Executor proxyInstance = (Executor) Proxy.newProxyInstance(executor.getClass().getClassLoader(),
+                new Class<?>[]{Executor.class}, executorProxy);
+        proxyInstance.compile(mainFile);
+        proxyInstance.exec(mainFile, case1 + " " + outputPath);
+        // 程序运行时间
+        Long runtime = executorProxy.getRuntime();
+        log.info("程序运行时间 -- > "+runtime);
 
 
         // Judge代码
