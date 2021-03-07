@@ -4,9 +4,9 @@ import auto.test.wordcount.executor.Executor;
 import auto.test.wordcount.executor.ExecutorProxy;
 import auto.test.wordcount.executor.JavaExecutor;
 import auto.test.wordcount.judge.Judge;
+import auto.test.wordcount.judge.JudgeItem;
 import auto.test.wordcount.judge.JudgeResult;
 import auto.test.wordcount.judge.WordCountJudge;
-import auto.test.wordcount.judge.WordCountTestCasesGenerator;
 import auto.test.wordcount.report.ReportData;
 import auto.test.wordcount.report.WordCountReportData;
 import auto.test.wordcount.utils.FileUtil;
@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Proxy;
 import java.util.*;
 
 import static auto.test.wordcount.utils.CSVUtil.exportToCSV;
@@ -81,82 +80,52 @@ public class Client {
         Map<String, String> src = generateSrc(repo);
         // 根据src目录获取对应的Executor，默认是Java Executor
 
+
+        Judge judge = new WordCountJudge();
+        List<JudgeResult> results = new ArrayList<>();
         for (String studentId : src.keySet()) {
             // main方法所在文件
             Executor executor = findExecutor(src.get(studentId));
             String mainFunFile = mainFunctionFilesLocation(src.get(studentId));
             executor.compile(mainFunFile);
+
+
+            JudgeResult judgeResult = new JudgeResult(studentId, new ArrayList<>());
+
             for (String caseId : testCases.keySet()) {
                 // TODO 以下代码需要优化！！！！！
+                // 重新设计testCases的数据结构
+                // 不应该用Map<String,Map<String,String>>
+                // 用Map<String, Node> 会比较方便
+                // 其中Node存答案地址，和测试用例的地址即可
                 Map<String, String> map = testCases.get(caseId);
-                Set<Map.Entry<String, String>> entries = map.entrySet();
-                Iterator<Map.Entry<String, String>> iterator = entries.iterator();
-                String key = null;
-                String answer;
+                Iterator<Map.Entry<String, String>> iterator = map.entrySet().iterator();
+                String testCaseLocation = null;
+                String answerLocation = null;
                 // iterator有且仅有一条记录
                 while (iterator.hasNext()) {
                     Map.Entry<String, String> next = iterator.next();
-                    key = next.getKey();
-                    answer = next.getValue();
+                    testCaseLocation = next.getKey();
+                    answerLocation = next.getValue();
                 }
-                executor.exec(mainFunFile, key + " " + findOutput(src.get(studentId), caseId));
+                String outputPath = findOutput(src.get(studentId), caseId);
+                executor.exec(mainFunFile, testCaseLocation + " " + outputPath);
+
+                // TODO
+                // 这里的数据结构设计也可以优化
+                Result result = judge.judge(outputPath, answerLocation);
+                JudgeItem judgeItem = new JudgeItem(String.valueOf(result.getScore()), "32");
+                judgeResult.getScore().add(judgeItem);
             }
+            results.add(judgeResult);
         }
 
-
-
-       /*
-        Map<String, Map<String, String>> answer = new HashMap<>();
-
-        List<JudgeResult> results = new ArrayList<>();
-       // TODO
-        // studentId 根据PersonalProject-Java目录下名称生成
-        String studentId = "890177";
-
-        // TODO
-        // D:\git\WordCountAutoTest\download\1614926251715 我们自动创建
-        // PersonalProject-Java\890177\src  这个目录是作业的规范目录
-        String srcPath = "D:\\git\\WordCountAutoTest\\download\\1614926251715\\PersonalProject-Java\\890177\\src";
-        String mainFile = srcPath + "\\WordCount.java";
-
-
-        // TODO 如果有时间多，可以考虑用DataGenerator来生成测试数据, 用对数器来生成答案
-        // 为下一步做准备
-
-        // TODO 如果上一步搞定了，那么这两个目录下的数据可以随机生成，
-        // 如果上一步时间不够，可以将tests目录和stds目录我们先规定死，测试数据也预先规定死
-        String tests = "D:\\git\\WordCountAutoTest\\archives\\tests";
-        String stds = "D:\\git\\WordCountAutoTest\\archives\\stds";
-        // 以上为准备信息
-
-        // 开始测试一个用例
-        String case1 = tests + File.separator + "rural.txt";
-        String answer1 = stds + File.separator + "std1.txt";
-        String outputPath = srcPath + "\\output.txt";
-        // 执行代码
-
-        Executor executor = new JavaExecutor();
-        ExecutorProxy executorProxy = new ExecutorProxy(executor);
-        // 动态代理获取运行时间
-        Executor proxyInstance = (Executor) Proxy.newProxyInstance(executor.getClass().getClassLoader(),
-                new Class<?>[]{Executor.class}, executorProxy);
-        proxyInstance.compile(mainFile);
-        proxyInstance.exec(mainFile, case1 + " " + outputPath);
-        // 程序运行时间
-        Long runtime = executorProxy.getRuntime();
-        log.info("程序运行时间 -- > " + runtime);
-
-
-        // Judge代码
-        Judge judge = new WordCountJudge();
-        Result result = judge.judge(outputPath, answer1);
-
-        // TODO judge to result
-
+        // export to csv
         ReportData reportData = new WordCountReportData(results);
         // 导出到CSV
-        exportToCSV(reportData, generateResultPath(repo));*/
+        exportToCSV(reportData, generateResultPath(repo));
     }
+
 
     private static String findOutput(String src, String caseId) {
         String parent = cn.hutool.core.io.FileUtil.getParent(src, 1);
@@ -237,6 +206,7 @@ public class Client {
             return null;
         }
         FileUtil.deleteFile(new File(repo, ".git"));
+        FileUtil.deleteFile(new File(repo, "example"));
         return repo;
     }
 
