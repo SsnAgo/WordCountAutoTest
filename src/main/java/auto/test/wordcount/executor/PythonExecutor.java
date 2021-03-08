@@ -20,8 +20,8 @@ public class PythonExecutor implements Executor {
     }
 
     @Override
-    public List<String> suffix() {
-        return Collections.singletonList("py");
+    public String mainFile() {
+        return "main.py";
     }
 
     @Override

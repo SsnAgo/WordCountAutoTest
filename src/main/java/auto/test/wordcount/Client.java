@@ -2,7 +2,6 @@ package auto.test.wordcount;
 
 import auto.test.wordcount.executor.Executor;
 import auto.test.wordcount.executor.ExecutorProxy;
-import auto.test.wordcount.executor.JavaExecutor;
 import auto.test.wordcount.judge.*;
 import auto.test.wordcount.report.ReportData;
 import auto.test.wordcount.report.WordCountReportData;
@@ -14,7 +13,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 
@@ -85,19 +83,16 @@ public class Client {
         List<JudgeResult> results = new ArrayList<>();
         for (String studentId : src.keySet()) {
             // main方法所在文件
-            Executor executor = null;
+            Executor executor;
             try {
                 executor = findExecutor(src.get(studentId));
             } catch (Exception e) {
                 log.error("not executor found studentId: {}", studentId);
                 continue;
             }
-            String mainFunFile = mainFunctionFilesLocation(src.get(studentId));
+            String mainFunFile = mainFunctionFilesLocation(src.get(studentId), executor.mainFile());
             executor.compile(mainFunFile);
-
-
             JudgeResult judgeResult = new JudgeResult(studentId, new ArrayList<>());
-
             for (String caseId : testCases.keySet()) {
                 // TODO 以下代码需要优化！！！！！
                 // 重新设计testCases的数据结构
@@ -120,6 +115,7 @@ public class Client {
                 // TODO
                 // 这里的数据结构设计也可以优化
                 Result result = judge.judge(outputPath, answerLocation);
+                // TODO 需要加入耗时统计
                 JudgeItem judgeItem = new JudgeItem(String.valueOf(result.getScore()), "32");
                 judgeResult.getScore().add(judgeItem);
             }
@@ -133,17 +129,23 @@ public class Client {
     }
 
 
+    /**
+     * 程序在执行caseId后对应的输出位置是哪里
+     *
+     * @param src
+     * @param caseId
+     * @return
+     */
     private static String findOutput(String src, String caseId) {
         String parent = cn.hutool.core.io.FileUtil.getParent(src, 1);
         return new File(new File(parent, "output"), caseId + ".txt").getAbsolutePath();
     }
 
-    // 查看srcLocation的后缀名来选择用哪个Executor
+
     private static Executor findExecutor(String srcLocation) throws Exception {
-        // FIXME
         // srcLocation : C:\git\WordCountAutoTest\download\1614954391268\PersonalProject-Java\890177\src
-        // 需要遍历srcLocation目录下的文件，看下是以什么结尾的
-        String suffix = srcLocation.substring(srcLocation.lastIndexOf(".") + 1);
+        // 需要遍历srcLocation目录下的文件，找到主执行函数所在的文件的文件名，这个文件名配置在每个Executor的mainFile()方法里面
+        List<String> sources = cn.hutool.core.io.FileUtil.listFileNames(srcLocation);
         Executor executor = null;
         Set<Class<?>> classes;
         try {
@@ -155,13 +157,11 @@ public class Client {
         out:
         for (Class<?> aClass : classes) {
             try {
-                final Method getSuffix = aClass.getMethod("suffix");
-                final List<String> suffixs = (List<String>) getSuffix.invoke(aClass.newInstance());
-                for (String s : suffixs) {
-                    if (s.equals(suffix)) {
-                        executor = (Executor) aClass.newInstance();
-                        break out;
-                    }
+                final Method getSuffix = aClass.getMethod("mainFile");
+                final String mainFile = (String) getSuffix.invoke(aClass.newInstance());
+                if (oneOf(mainFile, sources)) {
+                    executor = (Executor) aClass.newInstance();
+                    break out;
                 }
             } catch (Exception e) {
                 log.warn("find executor.suffix error");
@@ -178,9 +178,13 @@ public class Client {
         return (Executor) newProxyInstance(executor.getClass().getClassLoader(), new Class<?>[]{Executor.class}, executorProxy);
     }
 
+    private static boolean oneOf(String mainFile, List<String> sources) {
+        return sources.contains(mainFile);
+    }
+
     // main方法所在路径
-    public static String mainFunctionFilesLocation(String src) {
-        return new File(src, "WordCount.java").getAbsolutePath();
+    public static String mainFunctionFilesLocation(String src, String mainFile) {
+        return new File(src, mainFile).getAbsolutePath();
     }
 
     private static Map<String, String> generateSrc(String repo) {
@@ -235,7 +239,7 @@ public class Client {
             repo = clone("https://github.com/kofyou/PersonalProject-Java.git");
         } else {
             // 手动下载，指定下载仓库的目录
-            repo = "C:\\git\\WordCountAutoTest\\download\\1614954391268\\PersonalProject-Java";
+            repo = "D:\\git\\WordCountAutoTest\\download\\1614954391268\\PersonalProject-Java";
         }
         if (repo == null) {
             log.error("fail to clone project!!!!");

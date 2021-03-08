@@ -17,7 +17,6 @@ import static auto.test.wordcount.utils.FileUtil.getFolder;
  */
 public class JavaExecutor implements Executor {
     /**
-     *
      * @param mainFile
      */
     @Override
@@ -39,8 +38,8 @@ public class JavaExecutor implements Executor {
     }
 
     @Override
-    public List<String> suffix() {
-        return Collections.singletonList("java");
+    public String mainFile() {
+        return "WordCount.java";
     }
 
 

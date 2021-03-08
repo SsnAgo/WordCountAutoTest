@@ -24,8 +24,9 @@ public interface Executor {
     void exec(String src, String args);
 
     /**
-     * 返回语言源代码的后缀
-     * @return 后缀
+     * 返回语言主执行程序
+     *
+     * @return 主执行程序名称
      */
-     List<String> suffix();
+    String mainFile();
 }
