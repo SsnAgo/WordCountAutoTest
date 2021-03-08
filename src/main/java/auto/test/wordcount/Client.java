@@ -1,8 +1,8 @@
 package auto.test.wordcount;
 
 import auto.test.wordcount.executor.Executor;
-import auto.test.wordcount.proxy.ExecutorProxy;
 import auto.test.wordcount.judge.*;
+import auto.test.wordcount.proxy.ExecutorProxy;
 import auto.test.wordcount.report.ReportData;
 import auto.test.wordcount.report.WordCountReportData;
 import auto.test.wordcount.utils.ClassUtils;
@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.util.*;
 
 import static auto.test.wordcount.utils.CSVUtil.exportToCSV;
@@ -26,6 +25,7 @@ import static java.lang.reflect.Proxy.newProxyInstance;
  */
 public class Client {
     private static final Logger log = LoggerFactory.getLogger(Client.class);
+    private static ExecutorProxy executorProxy;
 
     /**
      * 在download文件夹下新建一个以当前时间戳为文件名的文件夹，然后把项目克隆到这个目录
@@ -116,7 +116,12 @@ public class Client {
                 // 这里的数据结构设计也可以优化
                 Result result = judge.judge(outputPath, answerLocation);
                 // TODO 需要加入耗时统计
-                JudgeItem judgeItem = new JudgeItem(String.valueOf(result.getScore()), "32");
+                
+                // 运行时间(秒) 
+                double runtime = (double)(executorProxy.getRuntime()) / 1000_000_000;
+                log.info("运行时间 {}", runtime);
+
+                JudgeItem judgeItem = new JudgeItem(String.valueOf(result.getScore()), String.valueOf(runtime));
                 judgeResult.getScore().add(judgeItem);
             }
             results.add(judgeResult);
@@ -171,7 +176,7 @@ public class Client {
             log.error("not found executor");
             throw new Exception("not found executor");
         }
-        ExecutorProxy executorProxy = new ExecutorProxy(executor);
+        executorProxy = new ExecutorProxy(executor);
         // 动态代理获取运行时间
         return (Executor) newProxyInstance(executor.getClass().getClassLoader(), new Class<?>[]{Executor.class}, executorProxy);
     }
