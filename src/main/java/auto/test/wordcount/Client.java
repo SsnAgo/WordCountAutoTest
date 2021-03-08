@@ -1,7 +1,7 @@
 package auto.test.wordcount;
 
 import auto.test.wordcount.executor.Executor;
-import auto.test.wordcount.executor.ExecutorProxy;
+import auto.test.wordcount.proxy.ExecutorProxy;
 import auto.test.wordcount.judge.*;
 import auto.test.wordcount.report.ReportData;
 import auto.test.wordcount.report.WordCountReportData;
@@ -149,7 +149,7 @@ public class Client {
         Executor executor = null;
         Set<Class<?>> classes;
         try {
-            classes = ClassUtils.getClasses("auto.test.wordcount.executor");
+            classes = ClassUtils.getClasses("auto.test.wordcount.executor.impl");
         } catch (IOException e) {
             classes = new HashSet<>();
             log.error("find executors error");
@@ -157,8 +157,7 @@ public class Client {
         out:
         for (Class<?> aClass : classes) {
             try {
-                final Method getSuffix = aClass.getMethod("mainFile");
-                final String mainFile = (String) getSuffix.invoke(aClass.newInstance());
+                final String mainFile = (String) aClass.getMethod("mainFile").invoke(aClass.newInstance());
                 if (oneOf(mainFile, sources)) {
                     executor = (Executor) aClass.newInstance();
                     break out;

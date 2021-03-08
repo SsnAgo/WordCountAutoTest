@@ -1,8 +1,8 @@
-package auto.test.wordcount.executor;
+package auto.test.wordcount.executor.impl;
+
+import auto.test.wordcount.executor.Executor;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
 
 import static auto.test.wordcount.utils.CmdUtil.cmd;
 

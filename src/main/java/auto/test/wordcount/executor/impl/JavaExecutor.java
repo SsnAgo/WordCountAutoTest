@@ -1,4 +1,6 @@
-package auto.test.wordcount.executor;
+package auto.test.wordcount.executor.impl;
+
+import auto.test.wordcount.executor.Executor;
 
 import java.io.File;
 import java.io.IOException;

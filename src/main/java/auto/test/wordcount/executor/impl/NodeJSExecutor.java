@@ -1,17 +1,15 @@
-package auto.test.wordcount.executor;
+package auto.test.wordcount.executor.impl;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import auto.test.wordcount.executor.Executor;
 
 /**
- * C++执行程序
+ * NodeJS执行程序
  *
  * @author <a href="mailto:410486047@qq.com">Grey</a>
  * @date 2021/3/2
  * @since
  */
-public class CppExecutor implements Executor {
+public class NodeJSExecutor implements Executor {
     @Override
     public void compile(String src) {
 
@@ -25,6 +23,6 @@ public class CppExecutor implements Executor {
 
     @Override
     public String mainFile() {
-        return "Main.cpp";
+        return "main.js";
     }
 }

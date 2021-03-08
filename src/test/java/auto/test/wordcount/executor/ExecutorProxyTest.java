@@ -1,5 +1,7 @@
 package auto.test.wordcount.executor;
 
+import auto.test.wordcount.executor.impl.JavaExecutor;
+import auto.test.wordcount.proxy.ExecutorProxy;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
