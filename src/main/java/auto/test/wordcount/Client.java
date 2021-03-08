@@ -136,6 +136,9 @@ public class Client {
         ReportData reportData = new WordCountReportData(results);
         // 导出到CSV
         exportToCSV(reportData, generateResultPath(repo));
+        
+        // 关闭线程池
+        executorService.shutdown();
     }
 
     /**
