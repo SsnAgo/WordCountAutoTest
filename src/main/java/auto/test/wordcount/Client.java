@@ -151,16 +151,15 @@ public class Client {
         try {
             classes = ClassUtils.getClasses("auto.test.wordcount.executor.impl");
         } catch (IOException e) {
-            classes = new HashSet<>();
-            log.error("find executors error");
+            log.error("find executors error {}", e.getMessage());
+            throw new Exception("fail to load executors");
         }
-        out:
         for (Class<?> aClass : classes) {
             try {
                 final String mainFile = (String) aClass.getMethod("mainFile").invoke(aClass.newInstance());
                 if (oneOf(mainFile, sources)) {
                     executor = (Executor) aClass.newInstance();
-                    break out;
+                    break;
                 }
             } catch (Exception e) {
                 log.warn("find executor.suffix error");
