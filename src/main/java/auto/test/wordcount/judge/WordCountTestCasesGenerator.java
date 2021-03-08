@@ -1,6 +1,8 @@
 package auto.test.wordcount.judge;
 
 import auto.test.wordcount.DataGenerator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -20,6 +22,7 @@ public class WordCountTestCasesGenerator {
     private int nums;
     private String repo;
     private Map<String, Map<String, String>> testCases;
+    private static final Logger log = LoggerFactory.getLogger(WordCountTestCasesGenerator.class);
 
     public Map<String, Map<String, String>> getTestCases() {
         return testCases;
@@ -64,9 +67,9 @@ public class WordCountTestCasesGenerator {
         File answers[] = answerFolder.listFiles();
         if (cases.length > 0 && answers.length > 0) {
             isReady = true;
-            System.out.println("测试用例已就绪！");
+            log.info("测试用例已就绪！");
             if (cases.length != nums || answers.length != nums) {
-                System.out.println("传入参数错误！");
+                log.error("传入参数错误！");
                 return config;
             }
         }
@@ -76,7 +79,7 @@ public class WordCountTestCasesGenerator {
             question.put(caseFolder + File.separator + count + ".txt", answerFolder + File.separator + count + ".txt");
             config.put(count + "", question);
             if (!isReady) {
-                System.out.println("生成新测试用例……");
+                log.info("生成新测试用例……");
                 // 写入题目文件
                 int length = (int) (1 + Math.random() * (maxLength - minLength + 1)); //生成随机长度
                 String caseContent = DataGenerator.generateContent(length); //生成随机字符串
@@ -102,8 +105,8 @@ public class WordCountTestCasesGenerator {
             bw = new BufferedWriter(fw);
             bw.write(content);
             bw.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            log.error("error to generate test cases {}", e.getMessage());
         }
     }
 }
