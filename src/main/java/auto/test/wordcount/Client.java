@@ -2,6 +2,7 @@ package auto.test.wordcount;
 
 import auto.test.wordcount.executor.Executor;
 import auto.test.wordcount.judge.*;
+import auto.test.wordcount.model.TestCase;
 import auto.test.wordcount.proxy.ExecutorProxy;
 import auto.test.wordcount.report.ReportData;
 import auto.test.wordcount.report.WordCountReportData;
@@ -75,7 +76,7 @@ public class Client {
         int testCaseNum = 5;
 
         // 如果用例准备好了，请返回准备好的用例信息
-        Map<String, Map<String, String>> testCases = generateTestCases(repo, testCaseNum);
+        Map<String, TestCase> testCases = generateTestCases(repo, testCaseNum);
 
         // 遍历仓库下的所有学生学号命名的文件夹，在这些文件夹下面建好一个output文件夹，用于存放学生程序的输出结果文件
         generateOutput(repo, testCaseNum);
@@ -105,16 +106,9 @@ public class Client {
                 // 不应该用Map<String,Map<String,String>>
                 // 用Map<String, Node> 会比较方便
                 // 其中Node存答案地址，和测试用例的地址即可
-                Map<String, String> map = testCases.get(caseId);
-                Iterator<Map.Entry<String, String>> iterator = map.entrySet().iterator();
-                String testCaseLocation = null;
-                String answerLocation = null;
-                // iterator有且仅有一条记录
-                while (iterator.hasNext()) {
-                    Map.Entry<String, String> next = iterator.next();
-                    testCaseLocation = next.getKey();
-                    answerLocation = next.getValue();
-                }
+                TestCase testCase = testCases.get(caseId); //储存用例地址和答案地址
+                String testCaseLocation = testCase.getCaseLocation();
+                String answerLocation = testCase.getAnswerLocation();
                 String outputPath = findOutput(src.get(studentId), caseId);
                 // 运行测试
                 boolean isRunTimeOut = runExec(executor, mainFunFile, testCaseLocation, outputPath);
@@ -243,7 +237,7 @@ public class Client {
     // repo : C:\git\WordCountAutoTest\download\1614954391268\PersonalProject-Java
     // 则生成测试用例的文件夹为 ： C:\git\WordCountAutoTest\download\1614954391268\cases
     // 对应答案的文件夹为：C:\git\WordCountAutoTest\download\1614954391268\answers
-    private static Map<String, Map<String, String>> generateTestCases(String repo, int testCaseNum) {
+    private static Map<String, TestCase> generateTestCases(String repo, int testCaseNum) {
         // TODO
         String parent = cn.hutool.core.io.FileUtil.getParent(repo, 1);
         WordCountTestCasesGenerator generator = new WordCountTestCasesGenerator(testCaseNum, parent);

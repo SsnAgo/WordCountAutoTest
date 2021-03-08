@@ -1,9 +1,11 @@
 package auto.test.wordcount;
 
 import auto.test.wordcount.judge.WordCountTestCasesGenerator;
+import auto.test.wordcount.model.TestCase;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
+import java.util.Map;
 
 /**
  * @author <a href="mailto:18965375150@163.com">siberia0015</a>
@@ -24,11 +26,22 @@ public class CasesTest {
         System.out.println(test.getTestCases());
     }
     /**
-     * 测试
+     * 测试生成用例地址能否正确被获取
      */
     @Test
     public void test(){
+        int num = 5;
+        File tmp = new File("download");
+        tmp.mkdir();
+        WordCountTestCasesGenerator generator = new WordCountTestCasesGenerator(num,tmp.getAbsolutePath());
+        Map<String, TestCase> testCases = generator.getTestCases();
+        for (String caseId : testCases.keySet()) {
+            TestCase testCase = testCases.get(caseId); //储存用例地址和答案地址
+            String testCaseLocation = testCase.getCaseLocation();
+            String answerLocation = testCase.getAnswerLocation();
+            System.out.println(testCaseLocation);
+            System.out.println(answerLocation);
+        }
 
-        System.out.println("");
     }
 }

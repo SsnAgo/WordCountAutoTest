@@ -1,6 +1,7 @@
 package auto.test.wordcount.judge;
 
 import auto.test.wordcount.DataGenerator;
+import auto.test.wordcount.model.TestCase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,10 +22,10 @@ import java.util.Map;
 public class WordCountTestCasesGenerator {
     private int nums;
     private String repo;
-    private Map<String, Map<String, String>> testCases;
+    private Map<String, TestCase> testCases;
     private static final Logger log = LoggerFactory.getLogger(WordCountTestCasesGenerator.class);
 
-    public Map<String, Map<String, String>> getTestCases() {
+    public Map<String, TestCase> getTestCases() {
         return testCases;
     }
 
@@ -35,13 +36,13 @@ public class WordCountTestCasesGenerator {
     }
 
     // 如果用例和答案准备好了，返回准备好的用例和答案信息，不需要重新新建测试用例和答案
-    private Map<String, Map<String, String>> testCases() {
+    private Map<String, TestCase> testCases() {
         // 生成nums数量的题目
         // config的key是题目编号，value的key是题目位置，value的value是答案的位置
         // 题目和答案位置一律放在某个写死的路径里面
         // 目前先只管生成题目，答案一律为空文件
 
-        Map<String, Map<String, String>> config = new HashMap<>(nums);
+        Map<String, TestCase> config = new HashMap<>(nums);
 
         // 生成目录
         File root = new File(repo);
@@ -75,8 +76,7 @@ public class WordCountTestCasesGenerator {
         }
 
         for (int count = 1; count <= nums; count++) {
-            Map<String, String> question = new HashMap<>();
-            question.put(caseFolder + File.separator + count + ".txt", answerFolder + File.separator + count + ".txt");
+            TestCase question = new TestCase(caseFolder + File.separator + count + ".txt", answerFolder + File.separator + count + ".txt", count + "");
             config.put(count + "", question);
             if (!isReady) {
                 log.info("生成新测试用例……");
