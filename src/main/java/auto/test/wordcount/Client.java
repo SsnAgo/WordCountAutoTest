@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.*;
 
 import static auto.test.wordcount.utils.CSVUtil.exportToCSV;
 import static java.lang.reflect.Proxy.newProxyInstance;
@@ -25,7 +26,12 @@ import static java.lang.reflect.Proxy.newProxyInstance;
  */
 public class Client {
     private static final Logger log = LoggerFactory.getLogger(Client.class);
+    
+    // 运行单个测试用例超时时间（分钟）
+    private static final int OVER_TIME = 2;
+    
     private static ExecutorProxy executorProxy;
+    private static ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     /**
      * 在download文件夹下新建一个以当前时间戳为文件名的文件夹，然后把项目克隆到这个目录
@@ -110,16 +116,21 @@ public class Client {
                     answerLocation = next.getValue();
                 }
                 String outputPath = findOutput(src.get(studentId), caseId);
-                executor.exec(mainFunFile, testCaseLocation + " " + outputPath);
+                // 运行测试
+                boolean isRunTimeOut = runExec(executor, mainFunFile, testCaseLocation, outputPath);
 
                 // TODO
                 // 这里的数据结构设计也可以优化
                 Result result = judge.judge(outputPath, answerLocation);
                 // TODO 需要加入耗时统计
+
+                // 运行时间(秒)
+                double runtime = -1;
+                if (!isRunTimeOut) {
+                    runtime = (double) (executorProxy.getRuntime()) / 1000_000_000;
+                }
                 
-                // 运行时间(秒) 
-                double runtime = (double)(executorProxy.getRuntime()) / 1000_000_000;
-                log.info("运行时间 {}", runtime);
+                log.info("运行时间 {} 是否超时 {} ", runtime,isRunTimeOut);
 
                 JudgeItem judgeItem = new JudgeItem(String.valueOf(result.getScore()), String.valueOf(runtime));
                 judgeResult.getScore().add(judgeItem);
@@ -133,6 +144,36 @@ public class Client {
         exportToCSV(reportData, generateResultPath(repo));
     }
 
+    /**
+     * 运行测试用例返回是否超时
+     *
+     * @param executor
+     * @param mainFunFile
+     * @param testCaseLocation
+     * @param outputPath
+     * @throws Exception
+     */
+    public static boolean runExec(Executor executor, String mainFunFile, String testCaseLocation, String outputPath) {
+
+        Future<?> future = executorService.submit(() ->
+                {
+                    executor.exec(mainFunFile, testCaseLocation + " " + outputPath);
+
+                }
+        );
+
+        try {
+            future.get(OVER_TIME, TimeUnit.MINUTES);
+            return false;
+        } catch (TimeoutException e) {
+            log.info("运行测试用例超时");
+            return true;
+        } catch (Exception e) {
+            log.error("运行测试用例异常", e);
+            return true;
+        }
+        
+    }
 
     /**
      * 程序在执行caseId后对应的输出位置是哪里
