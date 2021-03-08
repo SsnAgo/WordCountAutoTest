@@ -31,7 +31,8 @@ public class WordCountJudge implements Judge {
         Result result = new Result();
         result.result(resultPath).answer(answerPath);
         try {
-            result.score(checkValid(resultPath, answerPath));
+            int i = checkValid(resultPath, answerPath);
+            result.score(i);
         } catch (IOException e) {
             log.error("fail to check :{} {}", resultPath, e.getMessage());
             result.score(-1);
@@ -78,8 +79,8 @@ public class WordCountJudge implements Judge {
                 count += 15;
             }
             return count;
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            log.error("execute error found {} {}", e.getMessage(), standardPath);
             return -1; //其它错误
         }
     }
