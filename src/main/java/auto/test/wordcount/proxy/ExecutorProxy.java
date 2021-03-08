@@ -33,11 +33,11 @@ public class ExecutorProxy implements InvocationHandler {
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         // 只拦截exec方法
         if ("exec".equals(method.getName())) {
-            log.info("开始执行耗时统计");
+            log.info("开始执行耗时统计 {}",args[0]);
             long start = System.nanoTime();
             Object o = method.invoke(executor, args);
             runtime = System.nanoTime() - start;
-            log.info("程序耗时：" + runtime);
+            log.info("程序耗时：{} {}" , runtime ,args[0]);
             return o;
         } else {
             return method.invoke(executor, args);
