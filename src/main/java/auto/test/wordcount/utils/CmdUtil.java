@@ -37,10 +37,6 @@ public class CmdUtil {
         } catch (InterruptedException | IOException e) {
             log.error("execute cmd error {}  {} ", cmd, e.getMessage());
             return EXECUTE_ERROR_FLAG;
-        } finally {
-            if (process != null) {
-                process.destroy();
-            }
         }
     }
 }

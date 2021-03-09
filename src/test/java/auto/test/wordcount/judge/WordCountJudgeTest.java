@@ -10,8 +10,9 @@ public class WordCountJudgeTest {
 
     @Test
     public void checkValid() throws FileNotFoundException {
-        String standardPath = "C:\\git\\WordCountAutoTest\\download\\1614954341207\\stds\\std.txt";
-        String filePath = "C:\\git\\WordCountAutoTest\\download\\1614954341207\\stds\\student.txt";
+
+        String standardPath = "D:\\git\\WordCountAutoTest\\download\\1615249322321\\answers\\3.txt";
+        String filePath = "D:\\git\\WordCountAutoTest\\download\\1615249322321\\PersonalProject-Java\\221801432\\output\\3.txt";
         int score = WordCountJudge.checkValid(standardPath, filePath);
         System.out.println(score);
     }

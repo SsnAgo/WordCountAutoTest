@@ -31,7 +31,7 @@ public class WordCountJudge implements Judge {
         Result result = new Result();
         result.result(resultPath).answer(answerPath);
         try {
-            int i = checkValid(resultPath, answerPath);
+            int i = checkValid(answerPath,resultPath);
             result.score(i);
         } catch (IOException e) {
             log.error("fail to check :{} {}", resultPath, e.getMessage());
@@ -45,13 +45,14 @@ public class WordCountJudge implements Judge {
     public static int checkValid(String standardPath, String filePath) throws FileNotFoundException {
         int count = 0;
         InputStreamReader isrStandard = new InputStreamReader(new FileInputStream(standardPath));
-        BufferedReader buffStandard = new BufferedReader(isrStandard);
+
 
         InputStreamReader isrTest = new InputStreamReader(new FileInputStream(filePath));
-        BufferedReader buffTest = new BufferedReader(isrTest);
+
 
         String strStandard, strTest;
-        try {
+        try (BufferedReader buffStandard = new BufferedReader(isrStandard);
+             BufferedReader buffTest = new BufferedReader(isrTest)) {
             strStandard = buffStandard.readLine();
             strTest = buffTest.readLine();
             if (strStandard.equals(strTest)) { //第一行characters: n是相同的
