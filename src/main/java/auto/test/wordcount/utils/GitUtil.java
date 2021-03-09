@@ -68,7 +68,6 @@ public class GitUtil {
     }
 
     /**
-     * TODO
      * 获取某个文件夹的提交历史
      *
      * @param repo Git下载下来的仓库的本地地址 例如： C:\\git\\algorithm
@@ -80,7 +79,6 @@ public class GitUtil {
             // Git的本地地址 ："C:\\git\\algorithm"
             Git git = Git.open(new File(repo));
             LogCommand log = git.log();
-            // p
             Iterable<RevCommit> call = log.addPath(path).all().call();
             for (RevCommit commit : call) {
                 result.add(commit.getFullMessage());
@@ -90,6 +88,4 @@ public class GitUtil {
         }
         return result;
     }
-
-
 }

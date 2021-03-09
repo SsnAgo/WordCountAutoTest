@@ -4,6 +4,7 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.util.List;
 
 import static auto.test.wordcount.utils.FileUtil.generateEmptyFile;
 
@@ -20,5 +21,13 @@ public class GitUtilTest {
         /*TimeUnit.SECONDS.sleep(60);
         FileUtil.deleteFile(new File(fileA[0]));
         FileUtil.deleteFile(new File(fileB[0]));*/
+    }
+
+    @Test
+    public void testHistory() {
+        List<String> history = GitUtil.history("C:\\git2\\PersonalProject-Java", "221801103");
+        for (String his : history) {
+            System.out.println(his);
+        }
     }
 }
