@@ -22,7 +22,7 @@ public class CasesTest {
         File tmp = new File("download");
         tmp.mkdir();
 
-        WordCountTestCasesGenerator test = new WordCountTestCasesGenerator(num,tmp.getAbsolutePath());
+        WordCountTestCasesGenerator test = new WordCountTestCasesGenerator(num,tmp.getAbsolutePath(),1000000,100);
         System.out.println(test.getTestCases());
     }
     /**
@@ -33,7 +33,7 @@ public class CasesTest {
         int num = 5;
         File tmp = new File("download");
         tmp.mkdir();
-        WordCountTestCasesGenerator generator = new WordCountTestCasesGenerator(num,tmp.getAbsolutePath());
+        WordCountTestCasesGenerator generator = new WordCountTestCasesGenerator(num,tmp.getAbsolutePath(),100000,100);
         Map<String, TestCase> testCases = generator.getTestCases();
         for (String caseId : testCases.keySet()) {
             TestCase testCase = testCases.get(caseId); //储存用例地址和答案地址

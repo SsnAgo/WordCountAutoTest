@@ -23,15 +23,19 @@ public class WordCountTestCasesGenerator {
     private int nums;
     private String repo;
     private Map<String, TestCase> testCases;
+    private int maxLength;
+    private int minLength;
     private static final Logger log = LoggerFactory.getLogger(WordCountTestCasesGenerator.class);
 
     public Map<String, TestCase> getTestCases() {
         return testCases;
     }
 
-    public WordCountTestCasesGenerator(int nums, String repo) {
+    public WordCountTestCasesGenerator(int nums, String repo, int maxLength, int minLength) {
         this.nums = nums;
         this.repo = repo;
+        this.maxLength = maxLength;
+        this.minLength = minLength;
         this.testCases = testCases();
     }
 
@@ -59,8 +63,6 @@ public class WordCountTestCasesGenerator {
         }
 
         // 生成测试用例的长度范围
-        int maxLength = 1000000;
-        int minLength = 100;
 
         // 判断测试用例是否准备就绪
         boolean isReady = false;

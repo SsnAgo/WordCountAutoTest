@@ -216,7 +216,7 @@ public class Client {
     private static Map<String, TestCase> generateTestCases(String repo, int testCaseNum) {
         // TODO
         String parent = cn.hutool.core.io.FileUtil.getParent(repo, 1);
-        WordCountTestCasesGenerator generator = new WordCountTestCasesGenerator(testCaseNum, parent);
+        WordCountTestCasesGenerator generator = new WordCountTestCasesGenerator(testCaseNum, parent, 1000000,100);
         return generator.getTestCases();
        /* Map<String, Map<String, String>> map = new HashMap<>();
         String cases = "C:\\git\\WordCountAutoTest\\download\\1614954391268\\cases\\";
