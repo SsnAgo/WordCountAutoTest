@@ -1,13 +1,20 @@
 package auto.test.wordcount.utils;
 
 
+import auto.test.wordcount.Result;
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.LogCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.api.errors.NoHeadException;
+import org.eclipse.jgit.revwalk.RevCommit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Git的相关操作
@@ -58,6 +65,30 @@ public class GitUtil {
         }
         log.info("下载完成: {}", url);
         return true;
+    }
+
+    /**
+     * TODO
+     * 获取某个文件夹的提交历史
+     *
+     * @param repo Git下载下来的仓库的本地地址 例如： C:\\git\\algorithm
+     * @param path 这个仓库下任何一个文件或者文件夹的提交记录  例如：src/main/java/acwing
+     */
+    public static List<String> history(String repo, String path) {
+        List<String> result = new ArrayList<>();
+        try {
+            // Git的本地地址 ："C:\\git\\algorithm"
+            Git git = Git.open(new File(repo));
+            LogCommand log = git.log();
+            // p
+            Iterable<RevCommit> call = log.addPath(path).all().call();
+            for (RevCommit commit : call) {
+                result.add(commit.getFullMessage());
+            }
+        } catch (IOException | GitAPIException e) {
+            e.printStackTrace();
+        }
+        return result;
     }
 
 
