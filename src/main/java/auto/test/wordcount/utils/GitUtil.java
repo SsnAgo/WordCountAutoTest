@@ -75,9 +75,8 @@ public class GitUtil {
      */
     public static List<String> history(String repo, String path) {
         List<String> result = new ArrayList<>();
-        try {
+        try (Git git = Git.open(new File(repo))) {
             // Git的本地地址 ："C:\\git\\algorithm"
-            Git git = Git.open(new File(repo));
             LogCommand log = git.log();
             Iterable<RevCommit> call = log.addPath(path).all().call();
             for (RevCommit commit : call) {
