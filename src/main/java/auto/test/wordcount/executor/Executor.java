@@ -21,7 +21,7 @@ public interface Executor {
      * @param src  源码目录
      * @param args 命令参数
      */
-    void exec(String src, String args);
+    long exec(String src, String args);
 
     /**
      * 返回语言主执行程序

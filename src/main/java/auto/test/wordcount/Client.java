@@ -3,7 +3,6 @@ package auto.test.wordcount;
 import auto.test.wordcount.executor.Executor;
 import auto.test.wordcount.judge.*;
 import auto.test.wordcount.model.TestCase;
-import auto.test.wordcount.proxy.ExecutorProxy;
 import auto.test.wordcount.report.ReportData;
 import auto.test.wordcount.report.WordCountReportData;
 import auto.test.wordcount.utils.ClassUtils;
@@ -15,10 +14,8 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.*;
 
 import static auto.test.wordcount.utils.CSVUtil.exportToCSV;
-import static java.lang.reflect.Proxy.newProxyInstance;
 
 /**
  * @author <a href="mailto:410486047@qq.com">Grey</a>
@@ -27,12 +24,7 @@ import static java.lang.reflect.Proxy.newProxyInstance;
  */
 public class Client {
     private static final Logger log = LoggerFactory.getLogger(Client.class);
-    
-    // 运行单个测试用例超时时间（分钟）
-    private static final int OVER_TIME = 2;
-    
-    private static ExecutorProxy executorProxy;
-    private static ExecutorService executorService = Executors.newSingleThreadExecutor();
+
 
     /**
      * 在download文件夹下新建一个以当前时间戳为文件名的文件夹，然后把项目克隆到这个目录
@@ -63,7 +55,6 @@ public class Client {
     }
 
     public static void main(String[] args) {
-
         // 克隆代码仓库
         // 由于网络原因，clone经常失败，可以先手动下载，如果要自动下载，则把needPath = true
         String repo = preparePath(false);
@@ -101,31 +92,15 @@ public class Client {
             executor.compile(mainFunFile);
             JudgeResult judgeResult = new JudgeResult(studentId, new ArrayList<>());
             for (String caseId : testCases.keySet()) {
-                // TODO 以下代码需要优化！！！！！
-                // 重新设计testCases的数据结构
-                // 不应该用Map<String,Map<String,String>>
-                // 用Map<String, Node> 会比较方便
-                // 其中Node存答案地址，和测试用例的地址即可
                 TestCase testCase = testCases.get(caseId); //储存用例地址和答案地址
                 String testCaseLocation = testCase.getCaseLocation();
                 String answerLocation = testCase.getAnswerLocation();
                 String outputPath = findOutput(src.get(studentId), caseId);
-                // 运行测试
-                boolean isRunTimeOut = runExec(executor, mainFunFile, testCaseLocation, outputPath);
-
-                // TODO
-                // 这里的数据结构设计也可以优化
+                log.info("开始执行 学号为 {} 的作业 执行的测试用例为： {} ", studentId, caseId);
+                long runtime = executor.exec(mainFunFile, testCaseLocation + " " + outputPath);
+                log.info("学号为 {} 的作业 执行  {} 用例完毕， 执行时间为 {} 接下来开始测评...", studentId, caseId, runtime);
                 Result result = judge.judge(outputPath, answerLocation);
-                // TODO 需要加入耗时统计
-
-                // 运行时间(秒)
-                double runtime = -1;
-                if (!isRunTimeOut) {
-                    runtime = (double) (executorProxy.getRuntime()) / 1000_000_000;
-                }
-                
-                log.info("运行时间 {} 是否超时 {} ", runtime,isRunTimeOut);
-
+                log.info("学号为 {} 的作业 测评结果是：{}", studentId, result);
                 JudgeItem judgeItem = new JudgeItem(String.valueOf(result.getScore()), String.valueOf(runtime));
                 judgeResult.getScore().add(judgeItem);
             }
@@ -136,9 +111,9 @@ public class Client {
         ReportData reportData = new WordCountReportData(results);
         // 导出到CSV
         exportToCSV(reportData, generateResultPath(repo));
-        
+
         // 关闭线程池
-        executorService.shutdown();
+        //executorService.shutdown();
     }
 
     /**
@@ -150,27 +125,27 @@ public class Client {
      * @param outputPath
      * @throws Exception
      */
-    public static boolean runExec(Executor executor, String mainFunFile, String testCaseLocation, String outputPath) {
-
-        Future<?> future = executorService.submit(() ->
-                {
-                    executor.exec(mainFunFile, testCaseLocation + " " + outputPath);
-
-                }
-        );
-
-        try {
-            future.get(OVER_TIME, TimeUnit.MINUTES);
-            return false;
-        } catch (TimeoutException e) {
-            log.info("运行测试用例超时");
-            return true;
-        } catch (Exception e) {
-            log.error("运行测试用例异常", e);
-            return true;
-        }
-        
-    }
+//    public static boolean runExec(Executor executor, String mainFunFile, String testCaseLocation, String outputPath) {
+//
+//        Future<?> future = executorService.submit(() ->
+//                {
+//                    executor.exec(mainFunFile, testCaseLocation + " " + outputPath);
+//
+//                }
+//        );
+//
+//        try {
+//            future.get(OVER_TIME, TimeUnit.MINUTES);
+//            return false;
+//        } catch (TimeoutException e) {
+//            log.info("运行测试用例超时");
+//            return true;
+//        } catch (Exception e) {
+//            log.error("运行测试用例异常", e);
+//            return true;
+//        }
+//
+//    }
 
     /**
      * 程序在执行caseId后对应的输出位置是哪里
@@ -214,9 +189,7 @@ public class Client {
             log.error("not found executor");
             throw new Exception("not found executor");
         }
-        executorProxy = new ExecutorProxy(executor);
-        // 动态代理获取运行时间
-        return (Executor) newProxyInstance(executor.getClass().getClassLoader(), new Class<?>[]{Executor.class}, executorProxy);
+        return executor;
     }
 
     private static boolean oneOf(String mainFile, List<String> sources) {
@@ -280,7 +253,7 @@ public class Client {
             repo = clone("https://github.com/kofyou/PersonalProject-Java.git");
         } else {
             // 手动下载，指定下载仓库的目录
-            repo = "C:\\git\\WordCountAutoTest\\download\\1615200961176\\PersonalProject-Java";
+            repo = "C:\\git\\WordCountAutoTest\\download\\1615249322321\\PersonalProject-Java";
         }
         if (repo == null) {
             log.error("fail to clone project!!!!");

@@ -1,11 +1,16 @@
 package auto.test.wordcount.executor.impl;
 
 import auto.test.wordcount.executor.Executor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static auto.test.wordcount.utils.CmdUtil.cmd;
 import static auto.test.wordcount.utils.FileUtil.getFolder;
@@ -33,11 +38,11 @@ public class JavaExecutor implements Executor {
      * @return
      */
     @Override
-    public void exec(String mainFile, String input) {
-        String defaultClassPath = getFolder(mainFile);
-        String mainClass = getCompileClassName(mainFile);
-        java(defaultClassPath, mainClass, input);
+    public long exec(String mainFile, String input) {
+        return java(getFolder(mainFile), getCompileClassName(mainFile), input);
     }
+
+    private static final Logger log = LoggerFactory.getLogger(JavaExecutor.class);
 
     @Override
     public String mainFile() {
@@ -65,13 +70,8 @@ public class JavaExecutor implements Executor {
      * @param mainClass 编译后的Main文件
      * @param input     输入参数
      */
-    public void java(String classPath, String mainClass, String input) {
-        try {
-            cmd("java -classpath " + classPath + " " + mainClass + " " + input.trim());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+    public long java(String classPath, String mainClass, String input) {
+        return cmd("java -classpath " + classPath + " " + mainClass + " " + input.trim(), 10);
     }
 
     /**
@@ -82,11 +82,7 @@ public class JavaExecutor implements Executor {
      * @param mainClassPath Main文件的全路径 以上例子 mainClass为：C:\git\wordcount\src\Main.java
      */
     public void javac(String classPath, String mainClassPath) {
-        try {
-            cmd("javac -encoding UTF-8 -cp " + classPath + " " + mainClassPath);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        cmd("javac -encoding UTF-8 -cp " + classPath + " " + mainClassPath, 5);
     }
 
 

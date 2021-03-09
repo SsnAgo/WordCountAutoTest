@@ -1,10 +1,7 @@
 package auto.test.wordcount.executor;
 
 import auto.test.wordcount.executor.impl.JavaExecutor;
-import auto.test.wordcount.proxy.ExecutorProxy;
 import org.junit.jupiter.api.Test;
-
-import java.lang.reflect.Proxy;
 
 public class JavaExecutorTest {
 
@@ -12,11 +9,8 @@ public class JavaExecutorTest {
     public void exec() {
         Executor executor = new JavaExecutor();
 
-        Executor m = (Executor) Proxy.newProxyInstance(Executor.class.getClassLoader(),
-                new Class[]{Executor.class},
-                new ExecutorProxy(executor)
-        );
+
         executor.compile("C:\\git\\wordcount\\src\\WordCount.java");
-        m.exec("C:\\git\\wordcount\\src\\WordCount.java", "C:\\git\\rural.txt");
+        executor.exec("C:\\git\\wordcount\\src\\WordCount.java", "C:\\git\\rural.txt");
     }
 }

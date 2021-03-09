@@ -16,9 +16,9 @@ public class NodeJSExecutor implements Executor {
     }
 
     @Override
-    public void exec(String src, String input) {
+    public long exec(String src, String input) {
         // TODO
-
+        return -1;
     }
 
     @Override

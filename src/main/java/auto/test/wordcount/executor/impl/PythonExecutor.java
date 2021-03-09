@@ -25,15 +25,16 @@ public class PythonExecutor implements Executor {
     }
 
     @Override
-    public void exec(String src, String input) {
-        try {
-            if (null != input && !input.trim().equals("")) {
-                cmd("python " + src + " " + input);
-            } else {
-                cmd("python " + src);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public long exec(String src, String input) {
+//        try {
+//            if (null != input && !input.trim().equals("")) {
+//                cmd("python " + src + " " + input);
+//            } else {
+//                cmd("python " + src);
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+        return -1;
     }
 }
