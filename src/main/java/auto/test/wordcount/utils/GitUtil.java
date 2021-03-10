@@ -43,7 +43,7 @@ public class GitUtil {
      *                   如果为false，则clone后的文件夹会保留下来
      * @return 是否克隆成功, 成功为true，不成功为false
      */
-    public static boolean cloneRepo(String url, String localPath, boolean pathAsRoot) {
+    public static void cloneRepo(String url, String localPath, boolean pathAsRoot) throws GitAPIException {
         if (!pathAsRoot) {
             String repoName = url.substring(url.lastIndexOf("/") + 1).replace(".git", "");
             FileUtil.createFolder(localPath, repoName);
@@ -56,15 +56,8 @@ public class GitUtil {
         }
         log.info("开始下载: {}", url);
         // 需要公用仓库才能clone，私有仓库需要用户名密码
-        CloneCommand cloneCommand = Git.cloneRepository().setURI(url);
-        try {
-            cloneCommand.setDirectory(new File(localPath)).setTimeout(100).call();
-        } catch (GitAPIException e) {
-            log.error("下载错误: {} {}", url, e.getMessage());
-            return false;
-        }
+        Git.cloneRepository().setURI(url).setDirectory(new File(localPath)).setTimeout(100).call();
         log.info("下载完成: {}", url);
-        return true;
     }
 
     /**
