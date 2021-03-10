@@ -73,7 +73,9 @@ public class JavaExecutor implements Executor {
      * @param input     输入参数
      */
     public long java(String classPath, String mainClass, String input) {
-        return cmd("java -classpath " + classPath + " " + mainClass + " " + input.trim(), 10);
+        String cmd = "java -classpath " + classPath + " " + mainClass + " " + input.trim();
+        log.info("begin to exec {}", cmd);
+        return cmd(cmd, 20);
     }
 
     /**
@@ -84,7 +86,9 @@ public class JavaExecutor implements Executor {
      * @param mainClassPath Main文件的全路径 以上例子 mainClass为：C:\git\wordcount\src\Main.java
      */
     public void javac(String classPath, String mainClassPath) {
-        cmd("javac -encoding UTF-8 -cp " + classPath + " " + mainClassPath, 5);
+        String cmd = "javac -encoding UTF-8 -cp " + classPath + " " + mainClassPath.replace("WordCount.java", "*.java");
+        log.info("begin to compile {}", cmd);
+        cmd(cmd, 10);
     }
 
 

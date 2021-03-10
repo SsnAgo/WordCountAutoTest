@@ -63,7 +63,7 @@ public class Client {
     public static void main(String[] args) {
         // 克隆代码仓库
         // 由于网络原因，clone经常失败，可以先手动下载，如果要自动下载，则把needPath = true
-        String repo = preparePath(true);
+        String repo = preparePath(false);
         if (repo == null) {
             log.error("请设置仓库目录");
             return;
@@ -231,7 +231,7 @@ public class Client {
             repo = clone("https://github.com/kofyou/PersonalProject-Java.git");
         } else {
             // 手动下载，指定下载仓库的目录
-            repo = "D:\\git\\WordCountAutoTest\\download\\1615249322321\\PersonalProject-Java";
+            repo = "C:\\git\\WordCountAutoTest\\download\\1615377006511\\PersonalProject-Java";
         }
         if (repo == null) {
             log.error("fail to clone project!!!!");
