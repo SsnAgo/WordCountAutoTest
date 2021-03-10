@@ -28,4 +28,9 @@ public class FileUtilTest {
         deleteFile(new File(fileAPath[0]));
         deleteFile(new File(fileBPath[0]));
     }
+
+    @Test
+    public void testDeleteFile() {
+
+    }
 }

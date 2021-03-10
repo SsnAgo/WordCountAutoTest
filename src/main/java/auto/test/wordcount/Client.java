@@ -8,6 +8,8 @@ import auto.test.wordcount.report.WordCountReportData;
 import auto.test.wordcount.utils.ClassUtils;
 import auto.test.wordcount.utils.FileUtil;
 import auto.test.wordcount.utils.GitUtil;
+import cn.hutool.json.JSONArray;
+import com.alibaba.fastjson.JSON;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,29 +40,30 @@ public class Client {
      * @return 克隆后的绝对路径
      */
     public static String clone(String url) {
-        try {
-            File downloadFolder = new File("download");
-            if (!downloadFolder.exists()) {
-                downloadFolder.mkdir();
+        while (true) {
+            try {
+                File downloadFolder = new File("download");
+                if (!downloadFolder.exists()) {
+                    downloadFolder.mkdir();
+                }
+                // 以当前时间戳新建一个文件夹，防止冲突
+                String subFolder = String.valueOf(System.currentTimeMillis());
+                FileUtil.createFolder(downloadFolder.getAbsolutePath(), subFolder);
+                String allSourceCodePath = downloadFolder.getAbsolutePath() + File.separator + subFolder;
+                GitUtil.cloneRepo(url, allSourceCodePath, false);
+                String repo = allSourceCodePath + File.separator + url.replace(".git", "").substring(url.lastIndexOf("/") + 1);
+                log.info("clone to local folder {}", repo);
+                return repo;
+            } catch (Throwable e) {
+                log.error("clone {} , error {}", url, e.getMessage());
             }
-            // 以当前时间戳新建一个文件夹，防止冲突
-            String subFolder = String.valueOf(System.currentTimeMillis());
-            FileUtil.createFolder(downloadFolder.getAbsolutePath(), subFolder);
-            String allSourceCodePath = downloadFolder.getAbsolutePath() + File.separator + subFolder;
-            GitUtil.cloneRepo(url, allSourceCodePath, false);
-            String repo = allSourceCodePath + File.separator + url.replace(".git", "").substring(url.lastIndexOf("/") + 1);
-            log.info("clone to local folder {}", repo);
-            return repo;
-        } catch (Exception e) {
-            log.error("clone {} , error {}", url, e.getMessage());
         }
-        return null;
     }
 
     public static void main(String[] args) {
         // 克隆代码仓库
         // 由于网络原因，clone经常失败，可以先手动下载，如果要自动下载，则把needPath = true
-        String repo = preparePath(false);
+        String repo = preparePath(true);
         if (repo == null) {
             log.error("请设置仓库目录");
             return;
@@ -77,7 +80,6 @@ public class Client {
 
         // Key为学号，Value是该学号学生的代码路径
         Map<String, String> src = generateSrc(repo);
-        // 根据src目录获取对应的Executor，默认是Java Executor
 
 
         Judge judge = new WordCountJudge();
@@ -93,7 +95,10 @@ public class Client {
             }
             String mainFunFile = mainFunctionFilesLocation(src.get(studentId), executor.mainFile());
             executor.compile(mainFunFile);
-            JudgeResult judgeResult = new JudgeResult(studentId, new ArrayList<>());
+            Map<String, String> commitMessage = commitMessageOfPerStudent(repo, studentId);
+            int commitTimes = commitMessage.size();
+            String commitDetails = format(commitMessage);
+            JudgeResult judgeResult = new JudgeResult(studentId, new ArrayList<>(), String.valueOf(commitTimes), commitDetails);
             for (String caseId : testCases.keySet()) {
                 //储存用例地址和答案地址
                 TestCase testCase = testCases.get(caseId);
@@ -105,6 +110,7 @@ public class Client {
                 log.info("学号为 {} 的作业 执行  {} 用例完毕， 执行时间为 {}ms 接下来开始测评...", studentId, caseId, runtime);
                 Result result = judge.judge(outputPath, answerLocation);
                 log.info("学号为 {} 的作业 测评结果是：{}", studentId, result);
+
                 JudgeItem judgeItem = new JudgeItem(String.valueOf(result.getScore()), String.valueOf(runtime));
                 judgeResult.getScore().add(judgeItem);
             }
@@ -114,6 +120,19 @@ public class Client {
         ReportData reportData = new WordCountReportData(results);
         // 导出到CSV
         exportToCSV(reportData, generateResultPath(repo));
+    }
+
+    private static String format(Map<String, String> commitMessage) {
+        return JSON.toJSON(commitMessage).toString();
+    }
+
+    private static Map<String, String> commitMessageOfPerStudent(String repo, String studentId) {
+        List<String> history = GitUtil.history(repo, studentId);
+        Map<String, String> map = new HashMap<>();
+        for (int i = 0; i < history.size(); i++) {
+            map.put(String.valueOf(i), history.get(i));
+        }
+        return map;
     }
 
     /**
@@ -183,19 +202,9 @@ public class Client {
     // 则生成测试用例的文件夹为 ： C:\git\WordCountAutoTest\download\1614954391268\cases
     // 对应答案的文件夹为：C:\git\WordCountAutoTest\download\1614954391268\answers
     private static Map<String, TestCase> generateTestCases(String repo, int testCaseNum) {
-        // TODO
         String parent = cn.hutool.core.io.FileUtil.getParent(repo, 1);
         WordCountTestCasesGenerator generator = new WordCountTestCasesGenerator(testCaseNum, parent, 1000000, 100);
         return generator.getTestCases();
-       /* Map<String, Map<String, String>> map = new HashMap<>();
-        String cases = "C:\\git\\WordCountAutoTest\\download\\1614954391268\\cases\\";
-        String answers = "C:\\git\\WordCountAutoTest\\download\\1614954391268\\answers\\";
-        for (int i = 1; i <= testCaseNum; i++) {
-            Map<String, String> item = new HashMap<>();
-            item.put(cases + String.valueOf(i) + ".txt", answers + String.valueOf(i) + ".txt");
-            map.put(String.valueOf(i), item);
-        }
-        return map;*/
     }
 
     private static void generateOutput(String repo, int testCaseNum) {
@@ -217,7 +226,7 @@ public class Client {
     }
 
     private static String preparePath(boolean needClone) {
-        String repo = "";
+        String repo;
         if (needClone) {
             repo = clone("https://github.com/kofyou/PersonalProject-Java.git");
         } else {
@@ -228,11 +237,8 @@ public class Client {
             log.error("fail to clone project!!!!");
             return null;
         }
-        FileUtil.deleteFile(new File(repo, ".git"));
-        FileUtil.deleteFile(new File(repo, "example"));
         return repo;
     }
-
 
     private static String generateResultPath(String repo) {
         // repo : D:\\git\\download\\1614926251715\\PersonalProject-Java

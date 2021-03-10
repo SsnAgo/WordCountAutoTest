@@ -2,12 +2,10 @@ package auto.test.wordcount.judge;
 
 import auto.test.wordcount.Result;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.util.Objects;
 
-import static auto.test.wordcount.utils.FileUtil.content;
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * wordcount作业的Judge
@@ -17,7 +15,7 @@ import static auto.test.wordcount.utils.FileUtil.content;
  * @since
  */
 public class WordCountJudge implements Judge {
-    private static final Logger log = LoggerFactory.getLogger(WordCountJudge.class);
+    private static final Logger log = getLogger(WordCountJudge.class);
 
     /**
      * 评分，参考：WordCountTester#checkValid 方法
@@ -31,7 +29,7 @@ public class WordCountJudge implements Judge {
         Result result = new Result();
         result.result(resultPath).answer(answerPath);
         try {
-            int i = checkValid(answerPath,resultPath);
+            int i = checkValid(answerPath, resultPath);
             result.score(i);
         } catch (IOException e) {
             log.error("fail to check :{} {}", resultPath, e.getMessage());
@@ -45,30 +43,30 @@ public class WordCountJudge implements Judge {
     public static int checkValid(String standardPath, String filePath) throws FileNotFoundException {
         int count = 0;
         InputStreamReader isrStandard = new InputStreamReader(new FileInputStream(standardPath));
-
-
         InputStreamReader isrTest = new InputStreamReader(new FileInputStream(filePath));
-
-
         String strStandard, strTest;
         try (BufferedReader buffStandard = new BufferedReader(isrStandard);
              BufferedReader buffTest = new BufferedReader(isrTest)) {
             strStandard = buffStandard.readLine();
             strTest = buffTest.readLine();
-            if (strStandard.equals(strTest)) { //第一行characters: n是相同的
-                count += 1; //得1分
+            if (strStandard.equals(strTest)) {
+                //第一行characters: n是相同的 得1分
+                count += 1;
             }
             strStandard = buffStandard.readLine();
             strTest = buffTest.readLine();
-            if (strStandard.equals(strTest)) { //第二行words: m是相同的
-                count += 2; //得2分
+            if (strStandard.equals(strTest)) {
+                //第二行words: m是相同的 得2分
+                count += 2;
             }
             strStandard = buffStandard.readLine();
             strTest = buffTest.readLine();
-            if (strStandard.equals(strTest)) { //第三行lines: m是相同的
-                count += 2; //得2分
+            if (strStandard.equals(strTest)) {
+                //第三行lines: m是相同的  得2分
+                count += 2;
             }
-            boolean checkMain = true; //检查核心部分是否正确(求词频、求词组、求特定出现量的单词)
+            //检查核心部分是否正确(求词频、求词组、求特定出现量的单词)
+            boolean checkMain = true;
             while ((strStandard = buffStandard.readLine()) != null) {
                 strTest = buffTest.readLine();
                 if (!strStandard.equals(strTest)) {
@@ -76,13 +74,15 @@ public class WordCountJudge implements Judge {
                     break;
                 }
             }
-            if (checkMain) { //核心部分占15分
+            //核心部分占15分 完全正确才能得分，否则0分
+            if (checkMain) {
                 count += 15;
             }
             return count;
         } catch (Exception e) {
             log.error("execute error found {} {}", e.getMessage(), standardPath);
-            return -1; //其它错误
+            //其它错误
+            return -1;
         }
     }
 }

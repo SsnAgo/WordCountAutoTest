@@ -23,21 +23,26 @@ public class WordCountReportData implements ReportData {
 
     @Override
     public String[] headers() {
-        if(results.isEmpty()){
+        if (results.isEmpty()) {
             throw new RuntimeException("export data is empty");
         }
         final long count = results.get(0).getScore().size();
-        final String[] headers = new String[(int) (count * 2 + 2)];
+        final String[] headers = new String[(int) (count * 2 + 4)];
         headers[0] = "StudentNo";
-        headers[1] = "Scores";
-        for (int i = 1, index = 2; i <= count ; index++) {
-            if(index % 2 == 0){
+        headers[1] = "Score";
+        int index = 2;
+        for (int i = 1; i <= count; index++) {
+            if (index % 2 == 0) {
                 headers[index] = "Score" + i;
-            }else{
+            } else {
                 headers[index] = "Time" + i;
                 i++;
             }
         }
+        // 学生的提交次数
+        headers[index++] = "commit_times";
+        // 提交详情
+        headers[index] = "commit_details";
         return headers;
     }
 
@@ -53,7 +58,10 @@ public class WordCountReportData implements ReportData {
             for (JudgeItem judgeItem : result.getScore()) {
                 record.add(judgeItem.getScore());
                 record.add(judgeItem.getTime());
+
             }
+            record.add(result.getCommitTimes());
+            record.add(result.getCommitDetails());
             records.add(record);
         }
         return records;

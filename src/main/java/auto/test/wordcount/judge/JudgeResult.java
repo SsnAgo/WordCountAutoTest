@@ -10,10 +10,14 @@ import java.util.List;
 public class JudgeResult {
     private String studentNo;
     private List<JudgeItem> score;
+    private String commitTimes;
+    private String commitDetails;
 
-    public JudgeResult(String studentNo, List<JudgeItem> score) {
+    public JudgeResult(String studentNo, List<JudgeItem> score, String commitTimes, String commitDetails) {
         this.studentNo = studentNo;
         this.score = score;
+        this.commitTimes = commitTimes;
+        this.commitDetails = commitDetails;
     }
 
     public String getStudentNo() {
@@ -30,5 +34,21 @@ public class JudgeResult {
 
     public void setScore(List<JudgeItem> score) {
         this.score = score;
+    }
+
+    public String getCommitDetails() {
+        return commitDetails;
+    }
+
+    public void setCommitDetails(String commitDetails) {
+        this.commitDetails = commitDetails;
+    }
+
+    public String getCommitTimes() {
+        return commitTimes;
+    }
+
+    public void setCommitTimes(String commitTimes) {
+        this.commitTimes = commitTimes;
     }
 }

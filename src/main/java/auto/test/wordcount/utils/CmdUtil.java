@@ -24,7 +24,7 @@ public class CmdUtil {
      */
     public static long cmd(String cmd, int timeout) {
         Runtime runtime = Runtime.getRuntime();
-        Process process = null;
+        Process process;
         try {
             long start = System.currentTimeMillis();
             process = runtime.exec(cmd);
