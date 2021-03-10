@@ -168,7 +168,7 @@ public class Client {
                     break;
                 }
             } catch (Exception e) {
-                log.warn("find executor.suffix error");
+                log.warn("find executor.mainfile error");
                 break;
             }
 
@@ -232,10 +232,6 @@ public class Client {
         } else {
             // 手动下载，指定下载仓库的目录
             repo = "C:\\git\\WordCountAutoTest\\download\\1615377006511\\PersonalProject-Java";
-        }
-        if (repo == null) {
-            log.error("fail to clone project!!!!");
-            return null;
         }
         return repo;
     }
