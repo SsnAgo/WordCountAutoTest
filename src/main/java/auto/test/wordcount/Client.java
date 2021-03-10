@@ -70,7 +70,7 @@ public class Client {
         }
 
         // 默认测试用例的数量
-        int testCaseNum = 5;
+        int testCaseNum = 10;
 
         // 如果用例准备好了，请返回准备好的用例信息
         Map<String, TestCase> testCases = generateTestCases(repo, testCaseNum);
