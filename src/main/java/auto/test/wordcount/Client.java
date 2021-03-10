@@ -43,11 +43,14 @@ public class Client {
             if (!downloadFolder.exists()) {
                 downloadFolder.mkdir();
             }
+            // 以当前时间戳新建一个文件夹，防止冲突
             String subFolder = String.valueOf(System.currentTimeMillis());
             FileUtil.createFolder(downloadFolder.getAbsolutePath(), subFolder);
             String allSourceCodePath = downloadFolder.getAbsolutePath() + File.separator + subFolder;
             GitUtil.cloneRepo(url, allSourceCodePath, false);
-            return allSourceCodePath + File.separator + url.replace(".git", "").substring(url.lastIndexOf("/") + 1);
+            String repo = allSourceCodePath + File.separator + url.replace(".git", "").substring(url.lastIndexOf("/") + 1);
+            log.info("clone to local folder {}", repo);
+            return repo;
         } catch (Exception e) {
             log.error("clone {} , error {}", url, e.getMessage());
         }
@@ -92,13 +95,14 @@ public class Client {
             executor.compile(mainFunFile);
             JudgeResult judgeResult = new JudgeResult(studentId, new ArrayList<>());
             for (String caseId : testCases.keySet()) {
-                TestCase testCase = testCases.get(caseId); //储存用例地址和答案地址
+                //储存用例地址和答案地址
+                TestCase testCase = testCases.get(caseId);
                 String testCaseLocation = testCase.getCaseLocation();
                 String answerLocation = testCase.getAnswerLocation();
                 String outputPath = findOutput(src.get(studentId), caseId);
                 log.info("开始执行 学号为 {} 的作业 执行的测试用例为： {} ", studentId, caseId);
                 long runtime = executor.exec(mainFunFile, testCaseLocation + " " + outputPath);
-                log.info("学号为 {} 的作业 执行  {} 用例完毕， 执行时间为 {} 接下来开始测评...", studentId, caseId, runtime);
+                log.info("学号为 {} 的作业 执行  {} 用例完毕， 执行时间为 {}ms 接下来开始测评...", studentId, caseId, runtime);
                 Result result = judge.judge(outputPath, answerLocation);
                 log.info("学号为 {} 的作业 测评结果是：{}", studentId, result);
                 JudgeItem judgeItem = new JudgeItem(String.valueOf(result.getScore()), String.valueOf(runtime));
@@ -106,46 +110,11 @@ public class Client {
             }
             results.add(judgeResult);
         }
-
         // export to csv
         ReportData reportData = new WordCountReportData(results);
         // 导出到CSV
         exportToCSV(reportData, generateResultPath(repo));
-
-        // 关闭线程池
-        //executorService.shutdown();
     }
-
-    /**
-     * 运行测试用例返回是否超时
-     *
-     * @param executor
-     * @param mainFunFile
-     * @param testCaseLocation
-     * @param outputPath
-     * @throws Exception
-     */
-//    public static boolean runExec(Executor executor, String mainFunFile, String testCaseLocation, String outputPath) {
-//
-//        Future<?> future = executorService.submit(() ->
-//                {
-//                    executor.exec(mainFunFile, testCaseLocation + " " + outputPath);
-//
-//                }
-//        );
-//
-//        try {
-//            future.get(OVER_TIME, TimeUnit.MINUTES);
-//            return false;
-//        } catch (TimeoutException e) {
-//            log.info("运行测试用例超时");
-//            return true;
-//        } catch (Exception e) {
-//            log.error("运行测试用例异常", e);
-//            return true;
-//        }
-//
-//    }
 
     /**
      * 程序在执行caseId后对应的输出位置是哪里
@@ -216,7 +185,7 @@ public class Client {
     private static Map<String, TestCase> generateTestCases(String repo, int testCaseNum) {
         // TODO
         String parent = cn.hutool.core.io.FileUtil.getParent(repo, 1);
-        WordCountTestCasesGenerator generator = new WordCountTestCasesGenerator(testCaseNum, parent, 1000000,100);
+        WordCountTestCasesGenerator generator = new WordCountTestCasesGenerator(testCaseNum, parent, 1000000, 100);
         return generator.getTestCases();
        /* Map<String, Map<String, String>> map = new HashMap<>();
         String cases = "C:\\git\\WordCountAutoTest\\download\\1614954391268\\cases\\";

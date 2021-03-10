@@ -28,6 +28,7 @@ public class JavaExecutor implements Executor {
      */
     @Override
     public void compile(String mainFile) {
+        log.info("开始编译 {}", mainFile);
         String defaultClassPath = getFolder(mainFile);
         javac(defaultClassPath, mainFile);
     }
@@ -35,10 +36,11 @@ public class JavaExecutor implements Executor {
     /**
      * @param mainFile Main方法的全路径
      * @param input    测试用例参数 eg: -n input.txt
-     * @return
+     * @return 测试用例的执行时间
      */
     @Override
     public long exec(String mainFile, String input) {
+        log.info("开始执行 {} 输入参数 {}", mainFile, input);
         return java(getFolder(mainFile), getCompileClassName(mainFile), input);
     }
 
