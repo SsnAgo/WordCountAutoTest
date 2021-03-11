@@ -75,7 +75,7 @@ public class JavaExecutor implements Executor {
     public long java(String classPath, String mainClass, String input) {
         String cmd = "java -classpath " + classPath + " " + mainClass + " " + input.trim();
         log.info("begin to exec {}", cmd);
-        return cmd(cmd, 60);
+        return cmd(cmd, 120);
     }
 
     /**

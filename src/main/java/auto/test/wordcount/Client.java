@@ -70,7 +70,7 @@ public class Client {
         }
 
         // 默认测试用例的数量
-        int testCaseNum = 5;
+        int testCaseNum = 10;
 
         // 如果用例准备好了，请返回准备好的用例信息
         Map<String, TestCase> testCases = generateTestCases(repo, testCaseNum);
@@ -231,7 +231,7 @@ public class Client {
             repo = clone("https://github.com/kofyou/PersonalProject-Java.git");
         } else {
             // 手动下载，指定下载仓库的目录
-            repo = "C:\\git\\WordCountAutoTest\\download\\1615377006511\\PersonalProject-Java";
+            repo = "D:\\git\\WordCountAutoTest\\download\\1615421924089\\PersonalProject-Java";
         }
         if (repo == null) {
             log.error("fail to clone project!!!!");
