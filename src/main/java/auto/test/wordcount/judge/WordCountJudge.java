@@ -74,9 +74,9 @@ public class WordCountJudge implements Judge {
                     break;
                 }
             }
-            //核心部分占15分 完全正确才能得分，否则0分
+            //核心部分占5分 完全正确才能得分，否则0分
             if (checkMain) {
-                count += 15;
+                count += 5;
             }
             return count;
         } catch (Exception e) {

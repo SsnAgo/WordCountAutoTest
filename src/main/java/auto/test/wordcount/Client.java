@@ -231,7 +231,7 @@ public class Client {
             repo = clone("https://github.com/kofyou/PersonalProject-Java.git");
         } else {
             // 手动下载，指定下载仓库的目录
-            repo = "C:\\git\\WordCountAutoTest\\download\\1615377006511\\PersonalProject-Java";
+            repo = "D:\\git\\WordCountAutoTest\\download\\1615421924089\\PersonalProject-Java";
         }
         return repo;
     }
