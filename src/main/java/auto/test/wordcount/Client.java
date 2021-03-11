@@ -8,7 +8,6 @@ import auto.test.wordcount.report.WordCountReportData;
 import auto.test.wordcount.utils.ClassUtils;
 import auto.test.wordcount.utils.FileUtil;
 import auto.test.wordcount.utils.GitUtil;
-import cn.hutool.json.JSONArray;
 import com.alibaba.fastjson.JSON;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,10 +63,6 @@ public class Client {
         // 克隆代码仓库
         // 由于网络原因，clone经常失败，可以先手动下载，如果要自动下载，则把needPath = true
         String repo = preparePath(false);
-        if (repo == null) {
-            log.error("请设置仓库目录");
-            return;
-        }
 
         // 默认测试用例的数量
         int testCaseNum = 10;
