@@ -2,11 +2,22 @@ package auto.test.wordcount;
 
 /**
  * TODO 这个类的设计需要再考虑，暂不抽象，目前先实现功能
+ *
  * @author <a href="mailto:410486047@qq.com">Grey</a>
  * @date 2021/3/4
  * @since
  */
 public class Result {
+    @Override
+    public String toString() {
+        return "Result{" +
+                "src='" + src + '\'' +
+                ", result='" + result + '\'' +
+                ", answer='" + answer + '\'' +
+                ", score=" + score +
+                '}';
+    }
+
     /**
      * 代码目录
      */
@@ -19,10 +30,7 @@ public class Result {
      * 测试用例
      */
     private String answer;
-    /**
-     * 是否通过
-     */
-    private boolean pass;
+    private int score;
 
     public String getSrc() {
         return src;
@@ -51,12 +59,12 @@ public class Result {
         return this;
     }
 
-    public boolean isPass() {
-        return pass;
+    public int getScore() {
+        return score;
     }
 
-    public Result pass(boolean pass) {
-        this.pass = pass;
+    public Result score(int score) {
+        this.score = score;
         return this;
     }
 }

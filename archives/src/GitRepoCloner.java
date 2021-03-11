@@ -1,4 +1,4 @@
-package ref;
+package src;
 
 import java.io.File;
 import java.util.HashMap;
@@ -10,7 +10,6 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.InvalidRemoteException;
 import org.eclipse.jgit.api.errors.JGitInternalException;
 import org.eclipse.jgit.api.errors.TransportException;
-import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 
 
 public class GitRepoCloner {

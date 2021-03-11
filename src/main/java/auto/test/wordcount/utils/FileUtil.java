@@ -3,6 +3,9 @@ package auto.test.wordcount.utils;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static java.nio.charset.Charset.forName;
 import static java.nio.file.Files.readAllBytes;
@@ -119,8 +122,30 @@ public class FileUtil {
      * @return
      */
     public static String getFolder(String filePath) {
-        return filePath.substring(0,filePath.lastIndexOf(File.separator));
+        return cn.hutool.core.io.FileUtil.getParent(filePath, 1);
     }
 
 
+    /**
+     * 获取repo目录下所有子文件夹，不递归查询，至查询一级
+     *
+     * @param repo
+     * @return
+     */
+    public static List<String> listFolders(String repo) {
+        File file = new File(repo);
+        if (!file.exists()) {
+            return new ArrayList<>();
+        } else {
+            List<String> result = new ArrayList<>();
+            File[] list = file.listFiles();
+            for (File r : list) {
+                // 只要文件夹
+                if (r.isDirectory()) {
+                    result.add(r.getAbsolutePath());
+                }
+            }
+            return result;
+        }
+    }
 }
